@@ -9,14 +9,11 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     
     <style>
+      .rule-table {margin:4px}
       .group-symbols {background-color:#f0f9ff;}
-      
-      .group-values {background-color:#fcf2fc;}
-      
+      .group-values {background-color:#fcf2fc;}  
       .group-keywords {background-color:#edfaee;}
-      
       .group-case {background-color:#fcf1e3;}
-      
       .group-length {background-color:#f0f9ff;}
     </style>
     <title>Pytheas Rules</title>
@@ -96,7 +93,7 @@ function presentRules() {
 </nav>
 <div class="tab-content" id="nav-tabContent">
   <div class="tab-pane fade show active" id="nav-data_column" role="tabpanel" aria-labelledby="nav-data_column-tab"> 
-<table class="table table-striped table-bordered" id="data_column" class="display" >
+<table class="table table-striped table-bordered rule-table" id="data_column" class="display" >
 <thead class="thead-dark"><tr><th title="Field #1">#</th><th title="Field #2">Group</th><th title="Field #3">Index in Group</th><th title="Field #4">Name</th><th title="Field #5">English Description</th></tr></thead>
 <tbody>
 </tbody>
@@ -104,7 +101,7 @@ function presentRules() {
 </div>
     
 <div class="tab-pane fade" id="nav-notdata_column" role="tabpanel" aria-labelledby="nav-notdata_column-tab">
-<table class="table  table-striped table-bordered" id="not_data_column" class="display" >
+<table class="table  table-striped table-bordered rule-table" id="not_data_column" class="display" >
 <thead  class="thead-dark">
   <tr><th title="Field #1">#</th>
 <th title="Field #2">Group</th>
@@ -118,7 +115,7 @@ function presentRules() {
   </div>
   
 <div class="tab-pane fade" id="nav-data_line" role="tabpanel" aria-labelledby="nav-data_line-tab">
-<table class="table  table-striped table-bordered" id="data_line" class="display" >
+<table class="table  table-striped table-bordered rule-table" id="data_line" class="display" >
 <thead  class="thead-dark">
   <tr><th title="Field #1">#</th>
 <th title="Field #2">Group</th>
@@ -132,7 +129,7 @@ function presentRules() {
   </div>
   
   <div class="tab-pane fade" id="nav-notdata_line" role="tabpanel" aria-labelledby="nav-notdata_line-tab">
-<table class="table  table-striped table-bordered" id="not_data_line" class="display" >
+<table class="table  table-striped table-bordered rule-table" id="not_data_line" class="display" >
 <thead  class="thead-dark">
   <tr><th title="Field #1">#</th>
 <th title="Field #2">Group</th>
