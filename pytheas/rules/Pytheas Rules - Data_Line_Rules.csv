@@ -1,0 +1,5 @@
+#,Group,Index in Group,Name,English Description
+1,VALUES,1,AGGREGATION_TOKEN_IN_FIRST_VALUE_OF_ROW,"The first value of a line contains an aggregation keyword (e.g., 'Total Revenue')"
+2,KEYWORD,1,NULL_EQUIVALENT_ON_LINE_2_PLUS,"The line has two or more Null equivalent values (i.e., att least two cell values are found in the curated list of null equivalent keywords)"
+3,,2,ONE_NULL_EQUIVALENT_ON_LINE,"The line has one (and only one) Null equivalent value (i.e., one cell value is found in the curated list of null equivalent keywords)"
+4,,3,CONTAINS_DATATYPE_CELL_VALUE,"The line has at least one datatype value (i.e., at least one cell value is found in the curated list of datatypes)"

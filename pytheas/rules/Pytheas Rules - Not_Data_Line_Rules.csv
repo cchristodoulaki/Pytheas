@@ -1,0 +1,19 @@
+#,Group,Index in Group,Name,English Description
+1,SYMBOLS,1,METADATA_LIKE_ROW,"The first value on a line starts and ends with parenthesis, and all other cells are empty"
+2,,2,UP_TO_FIRST_COLUMN_COMPLETE_CONSISTENTLY,"From beginning of processing up to (and including) this line, all lines have at most the first cell value non-empty"
+3,,3,STARTS_WITH_NULL,First cell of the line is empty
+4,,4,NO_SUMMARY_BELOW,Lines exist below but no column forms a pattern
+5,CASE,1,CONSISTENTLY_SLUG_OR_SNAKE,All values in the line are consistently snake_case or camelCase
+6,,2,CONSISTENTLY_UPPER_CASE,All values in the line are consistently UPPERCASE
+7,VALUES,1,ADJACENT_ARITHMETIC_SEQUENCE_2,2 adjacent cells in a line form an arithmetic sequence
+8,,2,ADJACENT_ARITHMETIC_SEQUENCE_3,3 adjacent cells in a line form an arithmetic sequence
+9,,3,ADJACENT_ARITHMETIC_SEQUENCE_4,4 adjacent cells in a line form an arithmetic sequence
+10,,4,ADJACENT_ARITHMETIC_SEQUENCE_5,5 adjacent cells in a line form an arithmetic sequence
+11,,5,ADJACENT_ARITHMETIC_SEQUENCE_6_plus,6 or more adjacent cells in a line form an arithmetic sequence
+12,,6,RANGE_PAIRS_1,"One and only one range pair (i.e., two range values) in the line, evaluated by curated range regex"
+13,,7,RANGE_PAIRS_2_plus,"Two or more range pairs in the line, evaluated by curated range regex"
+14,,8,PARTIALLY_REPEATING_VALUES_length_2_plus,An alphabetic value repeats in  least two cells at a steady interval
+15,,9,AGGREGATION_ON_ROW_WO_NUMERIC,"Any cell value but first contains keyword 'total', row does not contain numeric values"
+16,,10,AGGREGATION_ON_ROW_W_ARITH_SEQUENCE,"Any cell value but first contains keyword 'total', row contains arithmetic sequence"
+17,KEYWORD,1,FOOTNOTE,The first cell value of a line matches a footnote keyword and third cell to end are empty
+18,,2,METADATA_TABLE_HEADER_KEYWORDS,"The line has at least one cell value from a curated list of common guide headers (i.e., at least one cell value is found in the curated list of guide headers)"
