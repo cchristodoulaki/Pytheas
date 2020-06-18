@@ -9,7 +9,15 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     
     <style>
-      group-symbols {background-color:#bee5eb;}
+      group-symbols {background-color:#f0f9ff;}
+      
+      group-values {background-color:#fcf2fc;}
+      
+      group-keywords {background-color:#edfaee;}
+      
+      group-case {background-color:#fcf1e3;}
+      
+      group-length {background-color:#f0f9ff;}
     </style>
     <title>Pytheas Rules</title>
     
@@ -42,154 +50,156 @@
 </tr></thead>
 <tbody><tr>
 <td align="right">1</td>
-<td>SYMBOLS</td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">1</td>
 <td>CONSISTENT_NUMERIC_WIDTH</td>
 <td>All cells in a context (excepting cells with null or null-equivalent values) have values that are numeric with a consistent digit count </td>
 </tr>
 <tr>
 <td align="right">2</td>
-<td> </td>
-<td align="right">2</td>
+
+<td class="group-symbols">SYMBOLS</td>
+  <td align="right">2</td>
 <td>CONSISTENT_NUMERIC</td>
 <td>All cells in a context (excepting cells with null or null-equivalent values) have values that are numeric</td>
 </tr>
 <tr>
 <td align="right">3</td>
-<td> </td>
+
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">3</td>
 <td>CONSISTENT_D_STAR</td>
 <td>All cells in a context (excepting cells with null or null-equivalent values) have values that are consistently have the same two consecutive symbols in their symbol sequence, and the first symbol is D (digit)</td>
 </tr>
 <tr>
 <td align="right">4</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">4</td>
 <td>FW_SUMMARY_D</td>
 <td>The pattern computed over all symbol sequences of cell values in a context starts with D (digit)</td>
 </tr>
 <tr>
 <td align="right">5</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">5</td>
 <td>BW_SUMMARY_D</td>
 <td>The pattern computed over all reversed symbol sequences of cell values in a context starts with D (digit)</td>
 </tr>
 <tr>
 <td align="right">6</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">6</td>
 <td>BROAD_NUMERIC</td>
 <td>All cells in a context (excepting cells with null or null-equivalent values) have values that are numeric (includes digits, decimals separated with the decimal comma or the decimal point, thousands indicated optionally with a comma, space, or point) </td>
 </tr>
 <tr>
 <td align="right">7</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">7</td>
 <td>FW_THREE_OR_MORE_NO_SPACE</td>
 <td>The pattern computed over all symbol sequences of cell values in a context has at least three symbols not including space</td>
 </tr>
 <tr>
 <td align="right">8</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">8</td>
 <td>BW_THREE_OR_MORE_NO_SPACE</td>
 <td>The pattern computed over all reversed symbol sequences of cell values in a context has at least three symbols not including space</td>
 </tr>
 <tr>
 <td align="right">9</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">9</td>
 <td>CONSISTENT_SS_NO_SPACE</td>
 <td>All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature, and that does not include a space</td>
 </tr>
 <tr>
 <td align="right">10</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">10</td>
 <td>CONSISTENT_SC_TWO_OR_MORE</td>
 <td>All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature of two or more symbols</td>
 </tr>
 <tr>
 <td align="right">11</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">11</td>
 <td>FW_TWO_OR_MORE_OR_MORE_NO_SPACE</td>
 <td>The pattern computed over all symbol sequences of cell values in a context has at least two symbols not including space</td>
 </tr>
 <tr>
 <td align="right">12</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">12</td>
 <td>BW_TWO_OR_MORE_OR_MORE_NO_SPACE</td>
 <td>The pattern computed over all reversed symbol sequences of cell values in a context has at least two symbols not including space</td>
 </tr>
 <tr>
 <td align="right">13</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">13</td>
 <td>FW_TWO_OR_MORE_OR_MORE_NO_SPACE_FIRST_TWO</td>
 <td>The pattern computed over all symbol sequences of cell values in a context has at least two symbols, the first two  not including space</td>
 </tr>
 <tr>
 <td align="right">14</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">14</td>
 <td>BW_TWO_OR_MORE_OR_MORE_NO_SPACE_FIRST_TWO</td>
 <td>The pattern computed over all reversed symbol sequences of cell values in a context has at least two symbols, the first two not including space</td>
 </tr>
 <tr>
 <td align="right">15</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">15</td>
 <td>FW_D5PLUS</td>
 <td>The pattern computed over all symbol sequences of cell values in a context is [[&#39;D&#39;,count]], where count&gt;=5</td>
 </tr>
 <tr>
 <td align="right">16</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">16</td>
 <td>BW_D5PLUS</td>
 <td>The pattern computed over all reversed symbol sequences of cell values in a context is [[&#39;D&#39;,count]], where count&gt;=5</td>
 </tr>
 <tr>
 <td align="right">17</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">17</td>
 <td>FW_D1</td>
 <td>The pattern computed over all symbol sequences of cell values in a context is [[&#39;D&#39;,1]]</td>
 </tr>
 <tr>
 <td align="right">18</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">18</td>
 <td>BW_D1</td>
 <td>The pattern computed over all reversed symbol sequences of cell values in a context is [[&#39;D&#39;,1]]</td>
 </tr>
 <tr>
 <td align="right">19</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">19</td>
 <td>FW_D4</td>
 <td>The pattern computed over all symbol sequences of cell values in a context is [[&#39;D&#39;,4]]</td>
 </tr>
 <tr>
 <td align="right">20</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">20</td>
 <td>BW_D4</td>
 <td>The pattern computed over all reversed symbol sequences of cell values in a context is [[&#39;D&#39;,4]]</td>
 </tr>
 <tr>
 <td align="right">21</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">21</td>
 <td>FW_LENGTH_4PLUS</td>
 <td>The pattern computed over all symbol sequences of cell values in a context has at least four symbols</td>
 </tr>
 <tr>
 <td align="right">22</td>
-<td> </td>
+<td class="group-symbols">SYMBOLS</td>
 <td align="right">22</td>
 <td>BW_LENGTH_4PLUS</td>
 <td>The pattern computed over all reversed symbol sequences of cell values in a context has at least four symbols</td>
