@@ -1,28 +1,28 @@
 #,Group,Index in Group,Name,English Description
 1,SYMBOLS,1,CONSISTENT_NUMERIC_WIDTH,All cells in a context (excepting cells with null or null-equivalent values) have values that are numeric with a consistent digit count 
-2,,2,CONSISTENT_NUMERIC,All cells in a context (excepting cells with null or null-equivalent values) have values that are numeric
-3,,3,CONSISTENT_D_STAR,"All cells in a context (excepting cells with null or null-equivalent values) have values that are consistently have the same two consecutive symbols in their symbol sequence, and the first symbol is D (digit)"
-4,,4,FW_SUMMARY_D,The pattern computed over all symbol sequences of cell values in a context starts with D (digit)
-5,,5,BW_SUMMARY_D,The pattern computed over all reversed symbol sequences of cell values in a context starts with D (digit)
-6,,6,BROAD_NUMERIC,"All cells in a context (excepting cells with null or null-equivalent values) have values that are numeric (includes digits, decimals separated with the decimal comma or the decimal point, thousands indicated optionally with a comma, space, or point) "
-7,,7,FW_THREE_OR_MORE_NO_SPACE,The pattern computed over all symbol sequences of cell values in a context has at least three symbols not including space
-8,,8,BW_THREE_OR_MORE_NO_SPACE,The pattern computed over all reversed symbol sequences of cell values in a context has at least three symbols not including space
-9,,9,CONSISTENT_SS_NO_SPACE,"All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature, and that does not include a space"
-10,,10,CONSISTENT_SC_TWO_OR_MORE,All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature of two or more symbols
-11,,11,FW_TWO_OR_MORE_OR_MORE_NO_SPACE,The pattern computed over all symbol sequences of cell values in a context has at least two symbols not including space
-12,,12,BW_TWO_OR_MORE_OR_MORE_NO_SPACE,The pattern computed over all reversed symbol sequences of cell values in a context has at least two symbols not including space
-13,,13,FW_TWO_OR_MORE_OR_MORE_NO_SPACE_FIRST_TWO,"The pattern computed over all symbol sequences of cell values in a context has at least two symbols, the first two  not including space"
-14,,14,BW_TWO_OR_MORE_OR_MORE_NO_SPACE_FIRST_TWO,"The pattern computed over all reversed symbol sequences of cell values in a context has at least two symbols, the first two not including space"
-15,,15,FW_D5PLUS,"The pattern computed over all symbol sequences of cell values in a context is [['D',count]], where count>=5"
-16,,16,BW_D5PLUS,"The pattern computed over all reversed symbol sequences of cell values in a context is [['D',count]], where count>=5"
-17,,17,FW_D1,"The pattern computed over all symbol sequences of cell values in a context is [['D',1]]"
-18,,18,BW_D1,"The pattern computed over all reversed symbol sequences of cell values in a context is [['D',1]]"
-19,,19,FW_D4,"The pattern computed over all symbol sequences of cell values in a context is [['D',4]]"
-20,,20,BW_D4,"The pattern computed over all reversed symbol sequences of cell values in a context is [['D',4]]"
-21,,21,FW_LENGTH_4PLUS,The pattern computed over all symbol sequences of cell values in a context has at least four symbols
-22,,22,BW_LENGTH_4PLUS,The pattern computed over all reversed symbol sequences of cell values in a context has at least four symbols
+2,SYMBOLS,2,CONSISTENT_NUMERIC,All cells in a context (excepting cells with null or null-equivalent values) have values that are numeric
+3,SYMBOLS,3,CONSISTENT_D_STAR,"All cells in a context (excepting cells with null or null-equivalent values) have values that are consistently have the same two consecutive symbols in their symbol sequence, and the first symbol is D (digit)"
+4,SYMBOLS,4,FW_SUMMARY_D,The pattern computed over all symbol sequences of cell values in a context starts with D (digit)
+5,SYMBOLS,5,BW_SUMMARY_D,The pattern computed over all reversed symbol sequences of cell values in a context starts with D (digit)
+6,SYMBOLS,6,BROAD_NUMERIC,"All cells in a context (excepting cells with null or null-equivalent values) have values that are numeric (includes digits, decimals separated with the decimal comma or the decimal point, thousands indicated optionally with a comma, space, or point) "
+7,SYMBOLS,7,FW_THREE_OR_MORE_NO_SPACE,The pattern computed over all symbol sequences of cell values in a context has at least three symbols not including space
+8,SYMBOLS,8,BW_THREE_OR_MORE_NO_SPACE,The pattern computed over all reversed symbol sequences of cell values in a context has at least three symbols not including space
+9,SYMBOLS,9,CONSISTENT_SS_NO_SPACE,"All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature, and that does not include a space"
+10,SYMBOLS,10,CONSISTENT_SC_TWO_OR_MORE,All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature of two or more symbols
+11,SYMBOLS,11,FW_TWO_OR_MORE_OR_MORE_NO_SPACE,The pattern computed over all symbol sequences of cell values in a context has at least two symbols not including space
+12,SYMBOLS,12,BW_TWO_OR_MORE_OR_MORE_NO_SPACE,The pattern computed over all reversed symbol sequences of cell values in a context has at least two symbols not including space
+13,SYMBOLS,13,FW_TWO_OR_MORE_OR_MORE_NO_SPACE_FIRST_TWO,"The pattern computed over all symbol sequences of cell values in a context has at least two symbols, the first two  not including space"
+14,SYMBOLS,14,BW_TWO_OR_MORE_OR_MORE_NO_SPACE_FIRST_TWO,"The pattern computed over all reversed symbol sequences of cell values in a context has at least two symbols, the first two not including space"
+15,SYMBOLS,15,FW_D5PLUS,"The pattern computed over all symbol sequences of cell values in a context is [['D',count]], where count>=5"
+16,SYMBOLS,16,BW_D5PLUS,"The pattern computed over all reversed symbol sequences of cell values in a context is [['D',count]], where count>=5"
+17,SYMBOLS,17,FW_D1,"The pattern computed over all symbol sequences of cell values in a context is [['D',1]]"
+18,SYMBOLS,18,BW_D1,"The pattern computed over all reversed symbol sequences of cell values in a context is [['D',1]]"
+19,SYMBOLS,19,FW_D4,"The pattern computed over all symbol sequences of cell values in a context is [['D',4]]"
+20,SYMBOLS,20,BW_D4,"The pattern computed over all reversed symbol sequences of cell values in a context is [['D',4]]"
+21,SYMBOLS,21,FW_LENGTH_4PLUS,The pattern computed over all symbol sequences of cell values in a context has at least four symbols
+22,SYMBOLS,22,BW_LENGTH_4PLUS,The pattern computed over all reversed symbol sequences of cell values in a context has at least four symbols
 23,CASE,1,CASE_SUMMARY_CAPS,All cell values in a context are consistently upper case
-24,,2,CONSISTENT_SINGLE_WORD_CONSISTENT_CASE,"All cell values in a context are consistently upper, lower or title case and each value is a single word"
+24,CASE,2,CONSISTENT_SINGLE_WORD_CONSISTENT_CASE,"All cell values in a context are consistently upper, lower or title case and each value is a single word"
 25,VALUES,1,VALUE_REPEATS_ONCE_BELOW,Cell value repeats once in the column context
-26,,2,VALUE_REPEATS_TWICE_OR_MORE_BELOW,Cell value repeats in the column context two or more times
+26,VALUES,2,VALUE_REPEATS_TWICE_OR_MORE_BELOW,Cell value repeats in the column context two or more times
 27,LENGTH,1,CONSISTENT_CHAR_LENGTH,All cell values in context have the same number of characters
