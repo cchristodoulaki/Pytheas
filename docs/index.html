@@ -1,1 +1,138 @@
-<html><body><p>Hello World</p></body></html>
+<html><body><p>Pytheas Rules/p>
+<table class="table table-bordered table-hover table-condensed">
+<thead><tr><th title="Field #1">#</th>
+<th title="Field #2">Group</th>
+<th title="Field #3">Index in Group</th>
+<th title="Field #4">Name</th>
+<th title="Field #5">English Description</th>
+</tr></thead>
+<tbody><tr>
+<td align="right">1</td>
+<td>SYMBOLS</td>
+<td align="right">1</td>
+<td>METADATA_LIKE_ROW</td>
+<td>The first value on a line starts and ends with parenthesis, and all other cells are empty</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td> </td>
+<td align="right">2</td>
+<td>UP_TO_FIRST_COLUMN_COMPLETE_CONSISTENTLY</td>
+<td>From beginning of processing up to (and including) this line, all lines have at most the first cell value non-empty</td>
+</tr>
+<tr>
+<td align="right">3</td>
+<td> </td>
+<td align="right">3</td>
+<td>STARTS_WITH_NULL</td>
+<td>First cell of the line is empty</td>
+</tr>
+<tr>
+<td align="right">4</td>
+<td> </td>
+<td align="right">4</td>
+<td>NO_SUMMARY_BELOW</td>
+<td>Lines exist below but no column forms a pattern</td>
+</tr>
+<tr>
+<td align="right">5</td>
+<td>CASE</td>
+<td align="right">1</td>
+<td>CONSISTENTLY_SLUG_OR_SNAKE</td>
+<td>All values in the line are consistently snake_case or camelCase</td>
+</tr>
+<tr>
+<td align="right">6</td>
+<td> </td>
+<td align="right">2</td>
+<td>CONSISTENTLY_UPPER_CASE</td>
+<td>All values in the line are consistently UPPERCASE</td>
+</tr>
+<tr>
+<td align="right">7</td>
+<td>VALUES</td>
+<td align="right">1</td>
+<td>ADJACENT_ARITHMETIC_SEQUENCE_2</td>
+<td>2 adjacent cells in a line form an arithmetic sequence</td>
+</tr>
+<tr>
+<td align="right">8</td>
+<td> </td>
+<td align="right">2</td>
+<td>ADJACENT_ARITHMETIC_SEQUENCE_3</td>
+<td>3 adjacent cells in a line form an arithmetic sequence</td>
+</tr>
+<tr>
+<td align="right">9</td>
+<td> </td>
+<td align="right">3</td>
+<td>ADJACENT_ARITHMETIC_SEQUENCE_4</td>
+<td>4 adjacent cells in a line form an arithmetic sequence</td>
+</tr>
+<tr>
+<td align="right">10</td>
+<td> </td>
+<td align="right">4</td>
+<td>ADJACENT_ARITHMETIC_SEQUENCE_5</td>
+<td>5 adjacent cells in a line form an arithmetic sequence</td>
+</tr>
+<tr>
+<td align="right">11</td>
+<td> </td>
+<td align="right">5</td>
+<td>ADJACENT_ARITHMETIC_SEQUENCE_6_plus</td>
+<td>6 or more adjacent cells in a line form an arithmetic sequence</td>
+</tr>
+<tr>
+<td align="right">12</td>
+<td> </td>
+<td align="right">6</td>
+<td>RANGE_PAIRS_1</td>
+<td>One and only one range pair (i.e., two range values) in the line, evaluated by curated range regex</td>
+</tr>
+<tr>
+<td align="right">13</td>
+<td> </td>
+<td align="right">7</td>
+<td>RANGE_PAIRS_2_plus</td>
+<td>Two or more range pairs in the line, evaluated by curated range regex</td>
+</tr>
+<tr>
+<td align="right">14</td>
+<td> </td>
+<td align="right">8</td>
+<td>PARTIALLY_REPEATING_VALUES_length_2_plus</td>
+<td>An alphabetic value repeats in  least two cells at a steady interval</td>
+</tr>
+<tr>
+<td align="right">15</td>
+<td> </td>
+<td align="right">9</td>
+<td>AGGREGATION_ON_ROW_WO_NUMERIC</td>
+<td>Any cell value but first contains keyword &#39;total&#39;, row does not contain numeric values</td>
+</tr>
+<tr>
+<td align="right">16</td>
+<td> </td>
+<td align="right">10</td>
+<td>AGGREGATION_ON_ROW_W_ARITH_SEQUENCE</td>
+<td>Any cell value but first contains keyword &#39;total&#39;, row contains arithmetic sequence</td>
+</tr>
+<tr>
+<td align="right">17</td>
+<td>KEYWORD</td>
+<td align="right">1</td>
+<td>FOOTNOTE</td>
+<td>The first cell value of a line matches a footnote keyword and third cell to end are empty</td>
+</tr>
+<tr>
+<td align="right">18</td>
+<td> </td>
+<td align="right">2</td>
+<td>METADATA_TABLE_HEADER_KEYWORDS</td>
+<td>The line has at least one cell value from a curated list of common guide headers (i.e., at least one cell value is found in the curated list of guide headers)</td>
+</tr>
+</tbody></table>
+  
+  
+  </body></html>
