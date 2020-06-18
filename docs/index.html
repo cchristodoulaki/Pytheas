@@ -9,12 +9,13 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     
     <style>
-      .rule-table {margin:25px}
-      .group-symbols {background-color:#f0f9ff;}
-      .group-values {background-color:#fcf2fc;}  
-      .group-keywords {background-color:#edfaee;}
-      .group-case {background-color:#fcf1e3;}
-      .group-length {background-color:#f0f9ff;}
+	    body {padding: 10px}    
+	    .rule-table {margin:25px}
+	    .group-symbols {background-color:#f0f9ff;}
+	    .group-values {background-color:#fcf2fc;}  
+	    .group-keywords {background-color:#edfaee;}
+	    .group-case {background-color:#fcf1e3;}
+	    .group-length {background-color:#f0f9ff;}
     </style>
     <title>Pytheas Rules</title>
     
@@ -38,8 +39,6 @@ rules={'data_column':"https://raw.githubusercontent.com/cchristodoulaki/Pytheas/
 
 
 function presentRules() {
-
-
 	$.each(rules, function(table, csv_url){    
 	    Papa.parse(csv_url, {
 		download: true,
@@ -47,41 +46,31 @@ function presentRules() {
 		complete: function(results) {
 			console.log(results.data);
 				//for each line in array
-			$.each(results.data,function(){
-			    
+			$.each(results.data,function(){   
 
 				//split files and create row
 				var row = new String("");
 				valArr = this
 				    row += "<tr>"
-
 				$.each(valArr, function(){
 				    row += "<td>" + this +"</td>"
-				});     
-
+				}); 
 				    row += "</tr>"
 
 				    //Add row to table
-				    $('#'+table+' tbody').append(row);
+				    $('#'+table+' tbody').append(row);			    
 
-			    
-
-			});
+				});
 			}
 		});
 	});
-
 }
 
 </script>  
   </head>
-  <body onload="presentRules()">
-  
+  <body onload="presentRules()">  
     
     <h1>Pytheas Rules</h1>
-
-
-
 <nav>
   <div class="nav nav-tabs" id="nav-tab" role="tablist">
     <a class="nav-item nav-link active" id="nav-data_column-tab" data-toggle="tab" href="#nav-data_column" role="tab" aria-controls="nav-data_column" aria-selected="true">Data Column</a>
@@ -140,11 +129,9 @@ function presentRules() {
   </thead>
 <tbody >
 </tbody></table>      
-  </div>  
-  
+  </div>    
 
-</div>
-
+</div> 
   
-  
-  </body></html>
+  </body>
+</html>
