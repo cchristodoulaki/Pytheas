@@ -10,8 +10,8 @@
 9,SYMBOLS,9,FW_THREE_OR_MORE_NO_SPACE,"The pattern computed over all symbol sequences of cell values in adjacent context has at least three symbols not including space, but not when this cell is added to the context"
 10,SYMBOLS,10,BW_THREE_OR_MORE_NO_SPACE,"The pattern computed over all reversed symbol sequences of cell values in adjacent context has at least three symbols not including space, but not when this cell is added to the context"
 11,SYMBOLS,11,CONSISTENT_SS_NO_SPACE,"All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature, and that does not include a space, but not when this cell is added to the context"
-12,SYMBOLS,12,FW_TWO_OR_MORE_OR_MORE_NO_SPACE,"The pattern computed over all  symbol sequences of cell values in an adjacent context has at least two symbols not including space, but pattern breaks when the symbol sequence of the cell is added"
-13,SYMBOLS,13,BW_TWO_OR_MORE_OR_MORE_NO_SPACE,"The pattern computed over all reversed symbol sequences of cell values in an adjacent context has at least two symbols not including space, but pattern breaks when the reversed symbol sequence of the cell is added"
+12,SYMBOLS,12,FW_TWO_OR_MORE_NO_SPACE,"The pattern computed over all  symbol sequences of cell values in an adjacent context has at least two symbols not including space, but pattern breaks when the symbol sequence of the cell is added"
+13,SYMBOLS,13,BW_TWO_OR_MORE_NO_SPACE,"The pattern computed over all reversed symbol sequences of cell values in an adjacent context has at least two symbols not including space, but pattern breaks when the reversed symbol sequence of the cell is added"
 14,CASE,1,CC,"Cell values in column context agree on case, cell value case disagrees"
 15,LENGTH,1,CHAR_COUNT_UNDER_POINT1_MIN,Cell length<10% of min cell length in context
 16,LENGTH,2,CHAR_COUNT_UNDER_POINT3_MIN,Cell length<30% of min cell length in context
