@@ -25,231 +25,108 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
   
-  
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/papaparse@5.2.0/papaparse.min.js"></script>
+    <script>
+
+
+rules={'data_column':"https://raw.githubusercontent.com/cchristodoulaki/Pytheas/master/pytheas/rules/Pytheas%20Rules%20-%20Data_Column_Rules.csv",
+	'not_data_column':"https://raw.githubusercontent.com/cchristodoulaki/Pytheas/master/pytheas/rules/Pytheas%20Rules%20-%20Not_Data_Column_Rules.csv",
+	'data_line':"https://raw.githubusercontent.com/cchristodoulaki/Pytheas/master/pytheas/rules/Pytheas%20Rules%20-%20Data_Line_Rules.csv",
+'not_data_line':"https://raw.githubusercontent.com/cchristodoulaki/Pytheas/master/pytheas/rules/Pytheas%20Rules%20-%20Not_Data_Line_Rules.csv"}
+
+
+function presentRules() {
+
+
+	$.each(rules, function(table, csv_url){    
+	    Papa.parse(csv_url, {
+		download: true,
+		header:true,
+		complete: function(results) {
+			console.log(results.data);
+				//for each line in array
+			$.each(results.data,function(){
+			    
+
+				//split files and create row
+				var row = new String("");
+				valArr = this
+				    row += "<tr>"
+
+				$.each(valArr, function(){
+				    row += "<td>" + this +"</td>"
+				});     
+
+				    row += "</tr>"
+
+				    //Add row to table
+				    $('#'+table+' tbody').append(row);
+
+			    
+
+			});
+			}
+		});
+	});
+
+}
+
+</script>  
   </head>
   <body onload="presentRules()">
   
     
     <h1>Pytheas Rules</h1>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-    <script>
-function presentRules() {
-  alert("Page is loaded");
-}
-</script>
+
 <h2>Column Rules</h2>  
 <h3>Data Column</h3>
-    
+ 
 <table class="table table-striped table-bordered" id="data_column" class="display" >
-<thead><tr><th title="Field #1">#</th>
+<thead class="thead-dark"><tr><th title="Field #1">#</th>
 <th title="Field #2">Group</th>
 <th title="Field #3">Index in Group</th>
 <th title="Field #4">Name</th>
 <th title="Field #5">English Description</th>
 </tr></thead>
-<tbody><tr>
-<td align="right">1</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">1</td>
-<td>CONSISTENT_NUMERIC_WIDTH</td>
-<td>All cells in a context (excepting cells with null or null-equivalent values) have values that are numeric with a consistent digit count </td>
-</tr>
-<tr>
-<td align="right">2</td>
-
-<td class="group-symbols">SYMBOLS</td>
-  <td align="right">2</td>
-<td>CONSISTENT_NUMERIC</td>
-<td>All cells in a context (excepting cells with null or null-equivalent values) have values that are numeric</td>
-</tr>
-<tr>
-<td align="right">3</td>
-
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">3</td>
-<td>CONSISTENT_D_STAR</td>
-<td>All cells in a context (excepting cells with null or null-equivalent values) have values that are consistently have the same two consecutive symbols in their symbol sequence, and the first symbol is D (digit)</td>
-</tr>
-<tr>
-<td align="right">4</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">4</td>
-<td>FW_SUMMARY_D</td>
-<td>The pattern computed over all symbol sequences of cell values in a context starts with D (digit)</td>
-</tr>
-<tr>
-<td align="right">5</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">5</td>
-<td>BW_SUMMARY_D</td>
-<td>The pattern computed over all reversed symbol sequences of cell values in a context starts with D (digit)</td>
-</tr>
-<tr>
-<td align="right">6</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">6</td>
-<td>BROAD_NUMERIC</td>
-<td>All cells in a context (excepting cells with null or null-equivalent values) have values that are numeric (includes digits, decimals separated with the decimal comma or the decimal point, thousands indicated optionally with a comma, space, or point) </td>
-</tr>
-<tr>
-<td align="right">7</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">7</td>
-<td>FW_THREE_OR_MORE_NO_SPACE</td>
-<td>The pattern computed over all symbol sequences of cell values in a context has at least three symbols not including space</td>
-</tr>
-<tr>
-<td align="right">8</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">8</td>
-<td>BW_THREE_OR_MORE_NO_SPACE</td>
-<td>The pattern computed over all reversed symbol sequences of cell values in a context has at least three symbols not including space</td>
-</tr>
-<tr>
-<td align="right">9</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">9</td>
-<td>CONSISTENT_SS_NO_SPACE</td>
-<td>All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature, and that does not include a space</td>
-</tr>
-<tr>
-<td align="right">10</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">10</td>
-<td>CONSISTENT_SC_TWO_OR_MORE</td>
-<td>All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature of two or more symbols</td>
-</tr>
-<tr>
-<td align="right">11</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">11</td>
-<td>FW_TWO_OR_MORE_OR_MORE_NO_SPACE</td>
-<td>The pattern computed over all symbol sequences of cell values in a context has at least two symbols not including space</td>
-</tr>
-<tr>
-<td align="right">12</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">12</td>
-<td>BW_TWO_OR_MORE_OR_MORE_NO_SPACE</td>
-<td>The pattern computed over all reversed symbol sequences of cell values in a context has at least two symbols not including space</td>
-</tr>
-<tr>
-<td align="right">13</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">13</td>
-<td>FW_TWO_OR_MORE_OR_MORE_NO_SPACE_FIRST_TWO</td>
-<td>The pattern computed over all symbol sequences of cell values in a context has at least two symbols, the first two  not including space</td>
-</tr>
-<tr>
-<td align="right">14</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">14</td>
-<td>BW_TWO_OR_MORE_OR_MORE_NO_SPACE_FIRST_TWO</td>
-<td>The pattern computed over all reversed symbol sequences of cell values in a context has at least two symbols, the first two not including space</td>
-</tr>
-<tr>
-<td align="right">15</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">15</td>
-<td>FW_D5PLUS</td>
-<td>The pattern computed over all symbol sequences of cell values in a context is [[&#39;D&#39;,count]], where count&gt;=5</td>
-</tr>
-<tr>
-<td align="right">16</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">16</td>
-<td>BW_D5PLUS</td>
-<td>The pattern computed over all reversed symbol sequences of cell values in a context is [[&#39;D&#39;,count]], where count&gt;=5</td>
-</tr>
-<tr>
-<td align="right">17</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">17</td>
-<td>FW_D1</td>
-<td>The pattern computed over all symbol sequences of cell values in a context is [[&#39;D&#39;,1]]</td>
-</tr>
-<tr>
-<td align="right">18</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">18</td>
-<td>BW_D1</td>
-<td>The pattern computed over all reversed symbol sequences of cell values in a context is [[&#39;D&#39;,1]]</td>
-</tr>
-<tr>
-<td align="right">19</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">19</td>
-<td>FW_D4</td>
-<td>The pattern computed over all symbol sequences of cell values in a context is [[&#39;D&#39;,4]]</td>
-</tr>
-<tr>
-<td align="right">20</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">20</td>
-<td>BW_D4</td>
-<td>The pattern computed over all reversed symbol sequences of cell values in a context is [[&#39;D&#39;,4]]</td>
-</tr>
-<tr>
-<td align="right">21</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">21</td>
-<td>FW_LENGTH_4PLUS</td>
-<td>The pattern computed over all symbol sequences of cell values in a context has at least four symbols</td>
-</tr>
-<tr>
-<td align="right">22</td>
-<td class="group-symbols">SYMBOLS</td>
-<td align="right">22</td>
-<td>BW_LENGTH_4PLUS</td>
-<td>The pattern computed over all reversed symbol sequences of cell values in a context has at least four symbols</td>
-</tr>
-<tr>
-<td align="right">23</td>
-<td>CASE</td>
-<td align="right">1</td>
-<td>CASE_SUMMARY_CAPS</td>
-<td>All cell values in a context are consistently upper case</td>
-</tr>
-<tr>
-<td align="right">24</td>
-<td> </td>
-<td align="right">2</td>
-<td>CONSISTENT_SINGLE_WORD_CONSISTENT_CASE</td>
-<td>All cell values in a context are consistently upper, lower or title case and each value is a single word</td>
-</tr>
-<tr>
-<td align="right">25</td>
-<td>VALUES</td>
-<td align="right">1</td>
-<td>VALUE_REPEATS_ONCE_BELOW</td>
-<td>Cell value repeats once in the column context</td>
-</tr>
-<tr>
-<td align="right">26</td>
-<td> </td>
-<td align="right">2</td>
-<td>VALUE_REPEATS_TWICE_OR_MORE_BELOW</td>
-<td>Cell value repeats in the column context two or more times</td>
-</tr>
-<tr>
-<td align="right">27</td>
-<td>LENGTH</td>
-<td align="right">1</td>
-<td>CONSISTENT_CHAR_LENGTH</td>
-<td>All cell values in context have the same number of characters</td>
-</tr>
+<tbody>
 </tbody>
     </table>
-<h3>Not Data Column</h3>
     
+
+<h3>Not Data Column</h3>
+<table class="table  table-striped table-bordered" id="not_data_column" class="display" >
+  
+<thead  class="thead-dark">
+  <tr><th title="Field #1">#</th>
+<th title="Field #2">Group</th>
+<th title="Field #3">Index in Group</th>
+<th title="Field #4">Name</th>
+<th title="Field #5">English Description</th>
+</tr>
+  </thead>
+<tbody >
+</tbody></table>    
     
 <h2>Line Rules</h2>    
 <h3>Data Line</h3>
+<table class="table  table-striped table-bordered" id="data_line" class="display" >
+  
+<thead  class="thead-dark">
+  <tr><th title="Field #1">#</th>
+<th title="Field #2">Group</th>
+<th title="Field #3">Index in Group</th>
+<th title="Field #4">Name</th>
+<th title="Field #5">English Description</th>
+</tr>
+  </thead>
+<tbody >
+</tbody></table>
 <h3>Not Data Line</h3>
 
 <table class="table  table-striped table-bordered" id="not_data_line" class="display" >
@@ -263,132 +140,6 @@ function presentRules() {
 </tr>
   </thead>
 <tbody >
-  <tr >
-<td align="right">1</td>
-<td class="table-info">SYMBOLS</td>
-<td align="right">1</td>
-<td>METADATA_LIKE_ROW</td>
-<td>The first value on a line starts and ends with parenthesis, and all other cells are empty</td>
-</tr>
-<tr >
-<td align="right">2</td>
-<td class="table-info">SYMBOLS</td>
-<td align="right">2</td>
-<td>UP_TO_FIRST_COLUMN_COMPLETE_CONSISTENTLY</td>
-<td>From beginning of processing up to (and including) this line, all lines have at most the first cell value non-empty</td>
-</tr>
-<tr >
-<td align="right">3</td>
-<td class="table-info"> SYMBOLS</td>
-<td align="right">3</td>
-<td>STARTS_WITH_NULL</td>
-<td>First cell of the line is empty</td>
-</tr>
-<tr class="table-info">
-<td align="right">4</td>
-<td>SYMBOLS</td>
-<td align="right">4</td>
-<td>NO_SUMMARY_BELOW</td>
-<td>Lines exist below but no column forms a pattern</td>
-</tr>
-<tr>
-<td align="right">5</td>
-<td>CASE</td>
-<td align="right">1</td>
-<td>CONSISTENTLY_SLUG_OR_SNAKE</td>
-<td>All values in the line are consistently snake_case or camelCase</td>
-</tr>
-<tr>
-<td align="right">6</td>
-<td> </td>
-<td align="right">2</td>
-<td>CONSISTENTLY_UPPER_CASE</td>
-<td>All values in the line are consistently UPPERCASE</td>
-</tr>
-<tr>
-<td align="right">7</td>
-<td>VALUES</td>
-<td align="right">1</td>
-<td>ADJACENT_ARITHMETIC_SEQUENCE_2</td>
-<td>2 adjacent cells in a line form an arithmetic sequence</td>
-</tr>
-<tr>
-<td align="right">8</td>
-<td> </td>
-<td align="right">2</td>
-<td>ADJACENT_ARITHMETIC_SEQUENCE_3</td>
-<td>3 adjacent cells in a line form an arithmetic sequence</td>
-</tr>
-<tr>
-<td align="right">9</td>
-<td> </td>
-<td align="right">3</td>
-<td>ADJACENT_ARITHMETIC_SEQUENCE_4</td>
-<td>4 adjacent cells in a line form an arithmetic sequence</td>
-</tr>
-<tr>
-<td align="right">10</td>
-<td> </td>
-<td align="right">4</td>
-<td>ADJACENT_ARITHMETIC_SEQUENCE_5</td>
-<td>5 adjacent cells in a line form an arithmetic sequence</td>
-</tr>
-<tr>
-<td align="right">11</td>
-<td> </td>
-<td align="right">5</td>
-<td>ADJACENT_ARITHMETIC_SEQUENCE_6_plus</td>
-<td>6 or more adjacent cells in a line form an arithmetic sequence</td>
-</tr>
-<tr>
-<td align="right">12</td>
-<td> </td>
-<td align="right">6</td>
-<td>RANGE_PAIRS_1</td>
-<td>One and only one range pair (i.e., two range values) in the line, evaluated by curated range regex</td>
-</tr>
-<tr>
-<td align="right">13</td>
-<td> </td>
-<td align="right">7</td>
-<td>RANGE_PAIRS_2_plus</td>
-<td>Two or more range pairs in the line, evaluated by curated range regex</td>
-</tr>
-<tr>
-<td align="right">14</td>
-<td> </td>
-<td align="right">8</td>
-<td>PARTIALLY_REPEATING_VALUES_length_2_plus</td>
-<td>An alphabetic value repeats in  least two cells at a steady interval</td>
-</tr>
-<tr>
-<td align="right">15</td>
-<td> </td>
-<td align="right">9</td>
-<td>AGGREGATION_ON_ROW_WO_NUMERIC</td>
-<td>Any cell value but first contains keyword &#39;total&#39;, row does not contain numeric values</td>
-</tr>
-<tr>
-<td align="right">16</td>
-<td> </td>
-<td align="right">10</td>
-<td>AGGREGATION_ON_ROW_W_ARITH_SEQUENCE</td>
-<td>Any cell value but first contains keyword &#39;total&#39;, row contains arithmetic sequence</td>
-</tr>
-<tr>
-<td align="right">17</td>
-<td>KEYWORD</td>
-<td align="right">1</td>
-<td>FOOTNOTE</td>
-<td>The first cell value of a line matches a footnote keyword and third cell to end are empty</td>
-</tr>
-<tr>
-<td align="right">18</td>
-<td> </td>
-<td align="right">2</td>
-<td>METADATA_TABLE_HEADER_KEYWORDS</td>
-<td>The line has at least one cell value from a curated list of common guide headers (i.e., at least one cell value is found in the curated list of guide headers)</td>
-</tr>
 </tbody></table>
   
   
