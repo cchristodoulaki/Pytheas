@@ -1,23 +1,23 @@
 #,Group,Index in Group,Name,English Description
 1,SYMBOLS,1,First_FW_Symbol_disagrees,The first symbol from the symbol equence of a cell value is different from the first symbol in the pattern computed over all  symbol sequences of cell values in an adjacent context 
-2,,2,First_BW_Symbol_disagrees,The first symbol from the reversed symbol equence of a cell value is different from the first symbol in the pattern computed over all reversed symbol sequences of cell values in an adjacent context
-3,,3,SymbolChain,"At least two values in the adjacent cell context are not null equivalent values, and all such values have the same symbol chain, but the value in this cell does not"
-4,,4,CONSISTENT_NUMERIC,"All cells in adjacent context (excepting cells with null or null-equivalent values) have values that are numeric, but not when this cell is added to the context"
-5,,5,CONSISTENT_D_STAR,"All cells in adjacent context (excepting cells with null or null-equivalent values) have values that are consistently have the same two consecutive symbols in their symbol sequence, and the first symbol is D (digit), but this does not hold when this cell is added to the context"
-6,,6,FW_SUMMARY_D,"The pattern computed over all symbol sequences of cell values in adjacent context starts with D (digit), but not when this cell is added to the context"
-7,,7,BW_SUMMARY_D,"The pattern computed over all reversed symbol sequences of cell values in adjacent context starts with D (digit), but not when this cell is added to the context"
-8,,8,BROAD_NUMERIC,"All cells in adjacent context (excepting cells with null or null-equivalent values) have values that are numeric (includes digits, decimals separated with the decimal comma or the decimal point, thousands indicated optionally with a comma, space, or point), but not when this cell is added to the context"
-9,,9,FW_THREE_OR_MORE_NO_SPACE,"The pattern computed over all symbol sequences of cell values in adjacent context has at least three symbols not including space, but not when this cell is added to the context"
-10,,10,BW_THREE_OR_MORE_NO_SPACE,"The pattern computed over all reversed symbol sequences of cell values in adjacent context has at least three symbols not including space, but not when this cell is added to the context"
-11,,11,CONSISTENT_SS_NO_SPACE,"All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature, and that does not include a space, but not when this cell is added to the context"
-12,,12,FW_TWO_OR_MORE_OR_MORE_NO_SPACE,"The pattern computed over all  symbol sequences of cell values in an adjacent context has at least two symbols not including space, but pattern breaks when the symbol sequence of the cell is added"
-13,,13,BW_TWO_OR_MORE_OR_MORE_NO_SPACE,"The pattern computed over all reversed symbol sequences of cell values in an adjacent context has at least two symbols not including space, but pattern breaks when the reversed symbol sequence of the cell is added"
+2,SYMBOLS,2,First_BW_Symbol_disagrees,The first symbol from the reversed symbol equence of a cell value is different from the first symbol in the pattern computed over all reversed symbol sequences of cell values in an adjacent context
+3,SYMBOLS,3,SymbolChain,"At least two values in the adjacent cell context are not null equivalent values, and all such values have the same symbol chain, but the value in this cell does not"
+4,SYMBOLS,4,CONSISTENT_NUMERIC,"All cells in adjacent context (excepting cells with null or null-equivalent values) have values that are numeric, but not when this cell is added to the context"
+5,SYMBOLS,5,CONSISTENT_D_STAR,"All cells in adjacent context (excepting cells with null or null-equivalent values) have values that are consistently have the same two consecutive symbols in their symbol sequence, and the first symbol is D (digit), but this does not hold when this cell is added to the context"
+6,SYMBOLS,6,FW_SUMMARY_D,"The pattern computed over all symbol sequences of cell values in adjacent context starts with D (digit), but not when this cell is added to the context"
+7,SYMBOLS,7,BW_SUMMARY_D,"The pattern computed over all reversed symbol sequences of cell values in adjacent context starts with D (digit), but not when this cell is added to the context"
+8,SYMBOLS,8,BROAD_NUMERIC,"All cells in adjacent context (excepting cells with null or null-equivalent values) have values that are numeric (includes digits, decimals separated with the decimal comma or the decimal point, thousands indicated optionally with a comma, space, or point), but not when this cell is added to the context"
+9,SYMBOLS,9,FW_THREE_OR_MORE_NO_SPACE,"The pattern computed over all symbol sequences of cell values in adjacent context has at least three symbols not including space, but not when this cell is added to the context"
+10,SYMBOLS,10,BW_THREE_OR_MORE_NO_SPACE,"The pattern computed over all reversed symbol sequences of cell values in adjacent context has at least three symbols not including space, but not when this cell is added to the context"
+11,SYMBOLS,11,CONSISTENT_SS_NO_SPACE,"All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature, and that does not include a space, but not when this cell is added to the context"
+12,SYMBOLS,12,FW_TWO_OR_MORE_OR_MORE_NO_SPACE,"The pattern computed over all  symbol sequences of cell values in an adjacent context has at least two symbols not including space, but pattern breaks when the symbol sequence of the cell is added"
+13,SYMBOLS,13,BW_TWO_OR_MORE_OR_MORE_NO_SPACE,"The pattern computed over all reversed symbol sequences of cell values in an adjacent context has at least two symbols not including space, but pattern breaks when the reversed symbol sequence of the cell is added"
 14,CASE,1,CC,"Cell values in column context agree on case, cell value case disagrees"
 15,LENGTH,1,CHAR_COUNT_UNDER_POINT1_MIN,Cell length<10% of min cell length in context
-16,,2,CHAR_COUNT_UNDER_POINT3_MIN,Cell length<30% of min cell length in context
-17,,3,CHAR_COUNT_OVER_POINT5_MAX,Cell length >150% of max cell length in context
-18,,4,CHAR_COUNT_OVER_POINT6_MAX,Cell length >160% of max cell length in context
-19,,5,CHAR_COUNT_OVER_POINT7_MAX,Cell length >170% of max cell length in context
-20,,6,CHAR_COUNT_OVER_POINT8_MAX,Cell length >180% of max cell length in context
-21,,7,CHAR_COUNT_OVER_POINT9_MAX,Cell length >190% of max cell length in context
-22,,8,NON_NUMERIC_CHAR_COUNT_DIFFERS_FROM_CONSISTENT,"Cell context values have a consistent character count, inconsistent with the cell value, and values are not numeric."
+16,LENGTH,2,CHAR_COUNT_UNDER_POINT3_MIN,Cell length<30% of min cell length in context
+17,LENGTH,3,CHAR_COUNT_OVER_POINT5_MAX,Cell length >150% of max cell length in context
+18,LENGTH,4,CHAR_COUNT_OVER_POINT6_MAX,Cell length >160% of max cell length in context
+19,LENGTH,5,CHAR_COUNT_OVER_POINT7_MAX,Cell length >170% of max cell length in context
+20,LENGTH,6,CHAR_COUNT_OVER_POINT8_MAX,Cell length >180% of max cell length in context
+21,LENGTH,7,CHAR_COUNT_OVER_POINT9_MAX,Cell length >190% of max cell length in context
+22,LENGTH,8,NON_NUMERIC_CHAR_COUNT_DIFFERS_FROM_CONSISTENT,"Cell context values have a consistent character count, inconsistent with the cell value, and values are not numeric."
