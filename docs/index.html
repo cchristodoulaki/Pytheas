@@ -32,6 +32,205 @@
   
 <h2>Column Rules</h2>  
 <h3>Data Column</h3>
+    
+<table class="table table-striped table-bordered" id="data_column" class="display" >
+<thead><tr><th title="Field #1">#</th>
+<th title="Field #2">Group</th>
+<th title="Field #3">Index in Group</th>
+<th title="Field #4">Name</th>
+<th title="Field #5">English Description</th>
+</tr></thead>
+<tbody><tr>
+<td align="right">1</td>
+<td>SYMBOLS</td>
+<td align="right">1</td>
+<td>CONSISTENT_NUMERIC_WIDTH</td>
+<td>All cells in a context (excepting cells with null or null-equivalent values) have values that are numeric with a consistent digit count </td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td> </td>
+<td align="right">2</td>
+<td>CONSISTENT_NUMERIC</td>
+<td>All cells in a context (excepting cells with null or null-equivalent values) have values that are numeric</td>
+</tr>
+<tr>
+<td align="right">3</td>
+<td> </td>
+<td align="right">3</td>
+<td>CONSISTENT_D_STAR</td>
+<td>All cells in a context (excepting cells with null or null-equivalent values) have values that are consistently have the same two consecutive symbols in their symbol sequence, and the first symbol is D (digit)</td>
+</tr>
+<tr>
+<td align="right">4</td>
+<td> </td>
+<td align="right">4</td>
+<td>FW_SUMMARY_D</td>
+<td>The pattern computed over all symbol sequences of cell values in a context starts with D (digit)</td>
+</tr>
+<tr>
+<td align="right">5</td>
+<td> </td>
+<td align="right">5</td>
+<td>BW_SUMMARY_D</td>
+<td>The pattern computed over all reversed symbol sequences of cell values in a context starts with D (digit)</td>
+</tr>
+<tr>
+<td align="right">6</td>
+<td> </td>
+<td align="right">6</td>
+<td>BROAD_NUMERIC</td>
+<td>All cells in a context (excepting cells with null or null-equivalent values) have values that are numeric (includes digits, decimals separated with the decimal comma or the decimal point, thousands indicated optionally with a comma, space, or point) </td>
+</tr>
+<tr>
+<td align="right">7</td>
+<td> </td>
+<td align="right">7</td>
+<td>FW_THREE_OR_MORE_NO_SPACE</td>
+<td>The pattern computed over all symbol sequences of cell values in a context has at least three symbols not including space</td>
+</tr>
+<tr>
+<td align="right">8</td>
+<td> </td>
+<td align="right">8</td>
+<td>BW_THREE_OR_MORE_NO_SPACE</td>
+<td>The pattern computed over all reversed symbol sequences of cell values in a context has at least three symbols not including space</td>
+</tr>
+<tr>
+<td align="right">9</td>
+<td> </td>
+<td align="right">9</td>
+<td>CONSISTENT_SS_NO_SPACE</td>
+<td>All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature, and that does not include a space</td>
+</tr>
+<tr>
+<td align="right">10</td>
+<td> </td>
+<td align="right">10</td>
+<td>CONSISTENT_SC_TWO_OR_MORE</td>
+<td>All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature of two or more symbols</td>
+</tr>
+<tr>
+<td align="right">11</td>
+<td> </td>
+<td align="right">11</td>
+<td>FW_TWO_OR_MORE_OR_MORE_NO_SPACE</td>
+<td>The pattern computed over all symbol sequences of cell values in a context has at least two symbols not including space</td>
+</tr>
+<tr>
+<td align="right">12</td>
+<td> </td>
+<td align="right">12</td>
+<td>BW_TWO_OR_MORE_OR_MORE_NO_SPACE</td>
+<td>The pattern computed over all reversed symbol sequences of cell values in a context has at least two symbols not including space</td>
+</tr>
+<tr>
+<td align="right">13</td>
+<td> </td>
+<td align="right">13</td>
+<td>FW_TWO_OR_MORE_OR_MORE_NO_SPACE_FIRST_TWO</td>
+<td>The pattern computed over all symbol sequences of cell values in a context has at least two symbols, the first two  not including space</td>
+</tr>
+<tr>
+<td align="right">14</td>
+<td> </td>
+<td align="right">14</td>
+<td>BW_TWO_OR_MORE_OR_MORE_NO_SPACE_FIRST_TWO</td>
+<td>The pattern computed over all reversed symbol sequences of cell values in a context has at least two symbols, the first two not including space</td>
+</tr>
+<tr>
+<td align="right">15</td>
+<td> </td>
+<td align="right">15</td>
+<td>FW_D5PLUS</td>
+<td>The pattern computed over all symbol sequences of cell values in a context is [[&#39;D&#39;,count]], where count&gt;=5</td>
+</tr>
+<tr>
+<td align="right">16</td>
+<td> </td>
+<td align="right">16</td>
+<td>BW_D5PLUS</td>
+<td>The pattern computed over all reversed symbol sequences of cell values in a context is [[&#39;D&#39;,count]], where count&gt;=5</td>
+</tr>
+<tr>
+<td align="right">17</td>
+<td> </td>
+<td align="right">17</td>
+<td>FW_D1</td>
+<td>The pattern computed over all symbol sequences of cell values in a context is [[&#39;D&#39;,1]]</td>
+</tr>
+<tr>
+<td align="right">18</td>
+<td> </td>
+<td align="right">18</td>
+<td>BW_D1</td>
+<td>The pattern computed over all reversed symbol sequences of cell values in a context is [[&#39;D&#39;,1]]</td>
+</tr>
+<tr>
+<td align="right">19</td>
+<td> </td>
+<td align="right">19</td>
+<td>FW_D4</td>
+<td>The pattern computed over all symbol sequences of cell values in a context is [[&#39;D&#39;,4]]</td>
+</tr>
+<tr>
+<td align="right">20</td>
+<td> </td>
+<td align="right">20</td>
+<td>BW_D4</td>
+<td>The pattern computed over all reversed symbol sequences of cell values in a context is [[&#39;D&#39;,4]]</td>
+</tr>
+<tr>
+<td align="right">21</td>
+<td> </td>
+<td align="right">21</td>
+<td>FW_LENGTH_4PLUS</td>
+<td>The pattern computed over all symbol sequences of cell values in a context has at least four symbols</td>
+</tr>
+<tr>
+<td align="right">22</td>
+<td> </td>
+<td align="right">22</td>
+<td>BW_LENGTH_4PLUS</td>
+<td>The pattern computed over all reversed symbol sequences of cell values in a context has at least four symbols</td>
+</tr>
+<tr>
+<td align="right">23</td>
+<td>CASE</td>
+<td align="right">1</td>
+<td>CASE_SUMMARY_CAPS</td>
+<td>All cell values in a context are consistently upper case</td>
+</tr>
+<tr>
+<td align="right">24</td>
+<td> </td>
+<td align="right">2</td>
+<td>CONSISTENT_SINGLE_WORD_CONSISTENT_CASE</td>
+<td>All cell values in a context are consistently upper, lower or title case and each value is a single word</td>
+</tr>
+<tr>
+<td align="right">25</td>
+<td>VALUES</td>
+<td align="right">1</td>
+<td>VALUE_REPEATS_ONCE_BELOW</td>
+<td>Cell value repeats once in the column context</td>
+</tr>
+<tr>
+<td align="right">26</td>
+<td> </td>
+<td align="right">2</td>
+<td>VALUE_REPEATS_TWICE_OR_MORE_BELOW</td>
+<td>Cell value repeats in the column context two or more times</td>
+</tr>
+<tr>
+<td align="right">27</td>
+<td>LENGTH</td>
+<td align="right">1</td>
+<td>CONSISTENT_CHAR_LENGTH</td>
+<td>All cell values in context have the same number of characters</td>
+</tr>
+</tbody>
+    </table>
 <h3>Not Data Column</h3>
     
     
