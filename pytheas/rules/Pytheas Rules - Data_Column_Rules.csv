@@ -9,10 +9,10 @@
 8,SYMBOLS,8,BW_THREE_OR_MORE_NO_SPACE,The pattern computed over all reversed symbol sequences of cell values in a context has at least three symbols not including space
 9,SYMBOLS,9,CONSISTENT_SS_NO_SPACE,"All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature, and that does not include a space"
 10,SYMBOLS,10,CONSISTENT_SC_TWO_OR_MORE,All cells in a context (excepting cells with null or null-equivalent values) have values that produce the same symbol set signature of two or more symbols
-11,SYMBOLS,11,FW_TWO_OR_MORE_OR_MORE_NO_SPACE,The pattern computed over all symbol sequences of cell values in a context has at least two symbols not including space
-12,SYMBOLS,12,BW_TWO_OR_MORE_OR_MORE_NO_SPACE,The pattern computed over all reversed symbol sequences of cell values in a context has at least two symbols not including space
-13,SYMBOLS,13,FW_TWO_OR_MORE_OR_MORE_NO_SPACE_FIRST_TWO,"The pattern computed over all symbol sequences of cell values in a context has at least two symbols, the first two  not including space"
-14,SYMBOLS,14,BW_TWO_OR_MORE_OR_MORE_NO_SPACE_FIRST_TWO,"The pattern computed over all reversed symbol sequences of cell values in a context has at least two symbols, the first two not including space"
+11,SYMBOLS,11,FW_TWO_OR_MORE_NO_SPACE,The pattern computed over all symbol sequences of cell values in a context has at least two symbols not including space
+12,SYMBOLS,12,BW_TWO_OR_MORE_NO_SPACE,The pattern computed over all reversed symbol sequences of cell values in a context has at least two symbols not including space
+13,SYMBOLS,13,FW_TWO_OR_MORE_NO_SPACE_FIRST_TWO,"The pattern computed over all symbol sequences of cell values in a context has at least two symbols, the first two  not including space"
+14,SYMBOLS,14,BW_TWO_OR_MORE_NO_SPACE_FIRST_TWO,"The pattern computed over all reversed symbol sequences of cell values in a context has at least two symbols, the first two not including space"
 15,SYMBOLS,15,FW_D5PLUS,"The pattern computed over all symbol sequences of cell values in a context is [['D',count]], where count>=5"
 16,SYMBOLS,16,BW_D5PLUS,"The pattern computed over all reversed symbol sequences of cell values in a context is [['D',count]], where count>=5"
 17,SYMBOLS,17,FW_D1,"The pattern computed over all symbol sequences of cell values in a context is [['D',1]]"
