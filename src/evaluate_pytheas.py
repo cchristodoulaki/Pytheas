@@ -27,8 +27,42 @@ from evaluation_utilities import assign_class
 import file_utilities
 
 
+# def generate_process_csv_tasks(db_cred,top_level_dir,pat_classifier, fold_id,test_keys, max_lines, assume_multi_tables, inject_percent_null, inject_percent_outlier, approach='PAT'):
+#     con = connect(dbname=db_cred.database, 
+#                     user=db_cred.user, 
+#                     host = 'localhost', 
+#                     password=db_cred.password, 
+#                     port = db_cred.port
+#                     )
+
+#     cur = con.cursor()
+#     cur.execute("""SELECT crawl_datafile_key, groundtruth_key, annotations, original_path, failure
+#                     FROM ground_truth_2k_canada 
+#                     WHERE annotations is not null 
+#                     AND endpoint_dbname in %s
+#                     AND crawl_datafile_key in %s
+#                     ORDER BY crawl_datafile_key""", (('open.canada.ca_data', 'data.surrey.ca', 'donnees.ville.montreal.qc.ca', 'data.ottawa.ca'), tuple(test_keys)))
+#     test_files = cur.fetchall()
+#     cur.close()
+#     con.close()
+
+#     file_counter = 0
+#     for file_object in test_files:
+#         crawl_datafile_key = file_object[0]
+#         original_path = file_object[3]
+#         annotations = file_object[2]
+#         failure = file_object[4]
+
+#         if  failure != None or annotations== None:
+#             print('skip')
+#         else:
+#             file_counter += 1
+#             task = (db_cred, file_counter, file_object, pat_classifier, fold_id, top_level_dir, max_lines, assume_multi_tables, approach, inject_percent_null, inject_percent_outlier)
+#             yield task
+
 def generate_process_csv_tasks(db_cred, top_level_dir, pytheas_classifier, fold_id, test_keys, max_lines, assume_multi_tables, inject_percent_null, inject_percent_outlier):
-    con = connect(dbname=db_cred.database, user=db_cred.user, host='localhost', password=db_cred.password,
+    con = connect(dbname=db_cred.database, 
+                    user=db_cred.user, host='localhost', password=db_cred.password,
                   port=db_cred.port)
 
     cur = con.cursor()
@@ -160,6 +194,7 @@ def inject_nulls(dataframe, annotations, inject_percent_null):
 
 def eval_pytheas_line_kfold(pytheas_classifier, k_folds, db_cred, top_level_dir, inject_percent_null,
                             inject_percent_outlier, num_processors, max_lines=100, assume_multi_tables=True):
+                            
     labels = ['BLANK', 'OTHER', 'HEADER', 'DATA', 'CONTEXT', 'FOOTNOTE', 'SUBHEADER']
     con = connect(dbname=db_cred.database, user=db_cred.user, host='localhost', password=db_cred.password, port=5532)
     cur = con.cursor()
@@ -492,8 +527,14 @@ def main():
 
     pytheas_classifier = pytheas.Pytheas()
     pytheas_classifier.connect_opendata_profile(db_cred)
-    eval_pytheas_line_kfold(pytheas_classifier, k_folds, db_cred, top_level_dir,
-                            inject_percent_null, inject_percent_outlier, num_processors, max_lines,
+    eval_pytheas_line_kfold(pytheas_classifier, 
+                            k_folds, 
+                            db_cred, 
+                            top_level_dir,
+                            inject_percent_null, 
+                            inject_percent_outlier, 
+                            num_processors, 
+                            max_lines,
                             assume_multi_tables)
 
 
