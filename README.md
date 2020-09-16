@@ -25,10 +25,7 @@ Christina Christodoulakis, Eric B. Munson, Moshe Gabel, Angela Demke Brown, and 
   number    = {11},
   pages     = {2075--2089},
   year      = {2020},
-  url       = {http://www.vldb.org/pvldb/vol13/p2075-christodoulakis.pdf},
-  timestamp = {Mon, 17 Aug 2020 18:32:39 +0200},
-  biburl    = {https://dblp.org/rec/journals/pvldb/Christodoulakis20.bib},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
+  url       = {http://www.vldb.org/pvldb/vol13/p2075-christodoulakis.pdf}
 }
 ```
 
