@@ -1,6 +1,6 @@
 # Pytheas: Pattern-based Table Discovery in CSV Files
 Code repository for [Pytheas: Pattern-based Table Discovery in CSV Files](http://www.vldb.org/pvldb/vol13/p2075-christodoulakis.pdf), presented at VLDB 2020.
-[![PytheasVLDB2020](http://img.youtube.com/vi/PHc-tGeZeD0/0.jpg)](https://www.youtube.com/watch?v=PHc-tGeZeD0&ab_channel=VLDB2020 "Video Title")
+[![PytheasVLDB2020](http://img.youtube.com/vi/PHc-tGeZeD0/0.jpg)](https://www.youtube.com/watch?v=PHc-tGeZeD0 "Pytheas VLDB2020")
 
 
 #### Abstract
