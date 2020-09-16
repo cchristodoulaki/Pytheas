@@ -31,3 +31,7 @@ Christina Christodoulakis, Eric B. Munson, Moshe Gabel, Angela Demke Brown, and 
 
 
 *Updated code and detailed instructions for use will be added in the coming weeks. 
+
+
+### Pytheas rule-set description
+[HTML rendering of Pytheas rules](https://cchristodoulaki.github.io/Pytheas/)
