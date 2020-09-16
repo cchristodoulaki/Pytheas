@@ -34,4 +34,4 @@ Christina Christodoulakis, Eric B. Munson, Moshe Gabel, Angela Demke Brown, and 
 
 
 ### Pytheas rule-set description
-[HTML rendering of Pytheas rules](https://cchristodoulaki.github.io/Pytheas/)
+[HTML rendering of Pytheas rules](https://cchristodoulaki.github.io/Pytheas/) listed in [https://github.com/cchristodoulaki/Pytheas/tree/master/pytheas/rules](https://github.com/cchristodoulaki/Pytheas/tree/master/pytheas/rules)
