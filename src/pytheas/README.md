@@ -1,5 +1,4 @@
-# Train Pytheas 
-
+# Pytheas Python API
 ## Train from dataset
 Training from annotated data requires two folders, one with CSV files and one with JSON files containing manual annotations over the CSV files. A file with annotations for a CSV file must have the same filename as the CSV file (and extension `.json`).
 
@@ -9,6 +8,8 @@ pytheas = pytheas.API()
 pytheas.learn_and_save_weights('../../data/Canada/csv_files','../../data/Canada/csv_annotations')
 ```
 ```python
+f1 = 'trained_rules.json'
+f2 = 'train_output.json'
 with open(f1) as f: 
     a = json.load(f)
 
@@ -63,45 +64,35 @@ file_annotations = Pytheas.infer_annotations(filepath)
 pprint(file_annotations)
 ```
 
-# Evaluate Pytheas
-[NOT A PRIORITY TO EXPOSE THIS]
-
-# Pytheas API
-
-## load_trained_rules(path_to_weights_file)
-load weights and parameters and sets them to the ocurrent object
-no DB required
-
-## infer_annotations(filepath)
-annotate file using current weughts and parameters
-no DB required
-
 ## set_params(params)
+[TODO]
 
 # Pytheas CLI
+
 ### learn_and_save_weights(files, annotations, output_path, parameters=None)
 learns weights and saves weights and parameters to output_path
 
 add a main function to the api?
 so there can be a command line way of using pytheas
 
-## train
+## Train
 ```
 pytheas train --files files --annotations annotations
 ```
-## infer
+
+E.g.:
+
+```
+python pytheas.py train -c ../../data/Canada/csv_files -a ../../data/Canada/csv_annotations -o train_output.json
+```
+
+## Infer
 ```
 pytheas infer --weights weightfile  --filepath filepath
 ```
+
 E.g.:
 ```
 python pytheas.py infer -w trained_rules.json -f ../../data/examples/open.canada.ca/3f718801-099d-4037-bb0a-1d41ba8aca8b/200d710b-17ac-4c1a-a624-fdcc5fc62af9 -o inferred_annotation.json
 ```
 
-
-
-
-# TODO
-on fresh machine, for use, install on fresh machine, install required libraries and run `load_trained_rules` and `annotate_file`
-
-Encode parameters in trained rules file (two dictionaries)

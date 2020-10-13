@@ -273,7 +273,6 @@ def detect_encoding(filepath):
 def merged_df(failure, all_csv_tuples):
     dataframes = []
     if failure==None and all_csv_tuples!=None and  len(all_csv_tuples)>0:      
-        table_counter = 0
         start_index = 0
         line_index = 0
         csv_tuples=[all_csv_tuples[0]]
@@ -338,24 +337,23 @@ def get_dataframe(filepath, max_lines):
     all_csv_tuples= None
     failure= None
     all_csv_tuples, discovered_delimiter, discovered_encoding, encoding_language, encoding_confidence, failure, blank_lines_index, google_detected_lang = sample_file(filepath, max_lines)
-    ## REMOVE CODE BELOW FOR PROCESSING ENDPOINT
-    num_lines = 0
-    blanklines=[]
-    if failure==None:
-        try:
-            all_csv_tuples = []
-            with codecs.open(filepath,'rU', encoding=discovered_encoding) as f:        
-                chunk = f.read()
-                if chunk:
-                    for line in csv.reader(chunk.split("\n"), quotechar='"', delimiter= discovered_delimiter, skipinitialspace=True):
-                        num_lines+=1
-                        if len(line) == 0 or sum(len(s.strip()) for s in line)==0:
-                            blanklines.append(num_lines-1)
-                        all_csv_tuples.append(line) 
-                        if max_lines!=None and len(all_csv_tuples)>=max_lines:
-                            break
-        except Exception as e:
-            print(f'file_utilities.get_dataframe:{e}, filepath:{filepath}')   
+        
+    if max_lines is None:
+        num_lines = 0
+        blanklines=[]
+        if failure==None:
+            try:
+                all_csv_tuples = []
+                with codecs.open(filepath,'rU', encoding=discovered_encoding) as f:        
+                    chunk = f.read()
+                    if chunk:
+                        for line in csv.reader(chunk.split("\n"), quotechar='"', delimiter= discovered_delimiter, skipinitialspace=True):
+                            num_lines+=1
+                            if len(line) == 0 or sum(len(s.strip()) for s in line)==0:
+                                blanklines.append(num_lines-1)
+                            all_csv_tuples.append(line) 
+            except Exception as e:
+                print(f'file_utilities.get_dataframe:{e}, filepath:{filepath}')   
 
     return merged_df(failure, all_csv_tuples)
 
@@ -425,7 +423,7 @@ def sample_file(filepath,max_batch= 100):
 
                 for line in csv.reader(chunk.split("\n"), quotechar='"', delimiter= discovered_delimiter, skipinitialspace=True):
                     lineindex+=1
-                    if len(line) ==0 or sum(len(s.strip()) for s in line)==0:
+                    if len(line) == 0 or sum(len(s.strip()) for s in line)==0:
                         blanklines.append(lineindex)
                     batch.append(line)
                     if max_batch!=None and len(batch)>=max_batch:

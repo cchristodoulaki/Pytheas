@@ -479,7 +479,7 @@ class API(object):
 
     def infer_annotations(self, filepath, max_lines=None):
         return self.real_pytheas.infer_annotations(filepath)
-
+        
     def learn_and_save_weights(self, files_path, annotations_path, output_path='train_output.json', parameters=None):
         # self.real_pytheas.clear_weights()
         if parameters:
@@ -494,7 +494,6 @@ class API(object):
         print(f'NPROC={NPROC}')
         # Process files
         combined_data=[]
-        exception_files = []
         with Pool(processes=NPROC) as pool:
             with tqdm(total=NINPUTS) as pbar:
                 for r in pool.imap_unordered(self.real_pytheas.rules_fired_in_file,[ (key, f[0], f[1])  for key,f in enumerate(zip(files,annotations))]):
@@ -566,13 +565,13 @@ class PYTHEAS:
         self.parameters = DotMap({
                 "undersample_data_limit":2,
                 "max_candidates":100,
-                "max_summary_strength":6,
-                "max_line_depth":30,
-                "max_attributes":20,
+                "max_summary_strength":6, # maximum non-empty values to consider for context
+                "max_line_depth":30, # max depth at which to search for the first data line
+                "max_attributes":20, # cuttof for columns to be considered (from left to right) when collecting class confidence 
                 "outlier_sensitive":True,
                 "normalize_decimals":True,
                 "impute_nulls":True,
-                "ignore_left":4,
+                "ignore_left":4, #if there are enough columns, ignore the first ignore_left when evaluating column class confidence (avoids taking into account what is often referred to as index columns or left headers.)
                 "summary_population_factor":True,
                 "weight_input": 'values_and_lines',
                 "weight_lower_bound": 0.4,
@@ -580,7 +579,7 @@ class PYTHEAS:
                 "p":0.3,
                 "markov_model":None,
                 "markov_approximation_probabilities":None,
-                "combined_label_weight":'confidence'#one of [confidence,confusion_index,difference]
+                "combined_label_weight":'confidence' #one of [confidence,confusion_index,difference]
                 })  
         self.ignore_rules = {
             "cell":{
@@ -1167,21 +1166,13 @@ class PYTHEAS:
 
 
     def infer_annotations(self, filepath, max_lines=None):
-        
-        # db_cred, file_counter, pytheas_model, crawl_datafile_key,endpoint, filepath, max_lines = t 
+       
         discovered_delimiter = None
         discovered_encoding = None
         num_lines_processed = None
-        last_line_processed = None
-        num_tables = None
         failure = None
-        traceback_str = None
         file_dataframe=None
-        predictions=None
-        first_table_fdl_confidence=None    
-        file_num_columns = None
-        file_max_columns_processed=None
-        start = timer()
+        annotations=None
         try:
             all_csv_tuples, discovered_delimiter, discovered_encoding, encoding_language, encoding_confidence, failure, blanklines, google_detected_lang = file_utilities.sample_file(filepath,10)
             num_lines_processed = 0
@@ -1213,12 +1204,34 @@ class PYTHEAS:
                         slice_idx = min(max_attributes,file_dataframe.shape[1])+1
 
                     file_max_columns_processed = file_dataframe.iloc[:,:slice_idx].shape[1]
-#                     print(file_dataframe.iloc[:,:slice_idx])
                     predictions = self.extract_tables(file_dataframe.iloc[:,:slice_idx],  blank_lines)
+            
+            annotations = {}
+            annotations["blanklines"] = blank_lines
+            annotations["lines_processed"] = last_line_processed
+            annotations["columns_in_file"] = file_num_columns
+            annotations["columns_in_file_considered"] = file_max_columns_processed
+            annotations["tables"] = []
+            for key in predictions.keys():
+                table = dict()
+                table["table_counter"] = key
+                table["top_boundary"] = predictions[key]["top_boundary"]
+                table["bottom_boundary"] = predictions[key]["bottom_boundary"]
+                table["data_start"] = predictions[key]["data_start"]
+                table["data_end"] = predictions[key]["data_end"]
+                table["header"] = predictions[key]["header"]
+                table["footnotes"] = predictions[key]["footnotes"]
+                table["subheaders"] = list(predictions[key]["subheader_scope"].keys())
+                table["confidence"] = {"body_start": predictions[key]["fdl_confidence"]["avg_majority_confidence"], 
+                                       "body_end": predictions[key]["data_end_confidence"],
+                                       "body": combined_table_confidence(predictions[key]["fdl_confidence"]["avg_majority_confidence"], 
+                                                                        predictions[key]["data_end_confidence"])}
+                annotations["tables"].append(table)
+
         except Exception as e: 
             print(f'filepath={filepath} failed to process, {e}: {traceback.format_exc()}')
         finally:
-            return predictions
+            return annotations
 
     def rules_fired_in_file(self,task):
         datafile_key, filepath, annotations_filepath =task
@@ -1259,7 +1272,7 @@ class PYTHEAS:
             end = timer()
             processing_time=end-start                                                                                                                            
             return datafile_key, pat_line_datapoints, pat_cell_datapoints, pat_data_line_rules, pat_not_data_line_rules, pat_data_cell_rules, pat_not_data_cell_rules, data_rules_fired, not_data_rules_fired, lines_in_file, lines_in_sample, processing_time
-        except Exception as ex:
+        except Exception:
             return Exception("Err on item {}".format(task)
                         #  + os.linesep + traceback.format_exc()
                          )
@@ -1267,10 +1280,9 @@ class PYTHEAS:
 
 
     def collect_rule_activation(self, db_cred, num_processors, top_level_dir):
-        assume_multi_tables = True
-        fuzzy_rules = self.fuzzy_rules
-        con = connect(dbname=db_cred.database, 
-                        user=db_cred.user, 
+        # fuzzy_rules = self.fuzzy_rules
+        con = connect(dbname = db_cred.database, 
+                        user = db_cred.user, 
                         host = 'localhost', 
                         password=db_cred.password, 
                         port = db_cred.port) 
@@ -1311,8 +1323,7 @@ class PYTHEAS:
                 for r in pool.imap_unordered(pat_rule_worker,
                                              generate_rule_annotation_tasks(self, 
                                                                             top_level_dir, 
-                                                                            db_cred, 
-                                                                            assume_multi_tables)):
+                                                                            db_cred)):
                     combined_data.append(r)
                     pbar.update(1) 
 
@@ -1453,7 +1464,7 @@ class PYTHEAS:
         cur.close()
         con.close() 
 
-def generate_rule_annotation_tasks(pat_model, top_level_dir, db_cred, assume_multi_tables):
+def generate_rule_annotation_tasks(pat_model, top_level_dir, db_cred):
 
     
     con = connect(dbname=db_cred.database, user=db_cred.user, host = 'localhost', password=db_cred.password, port = db_cred.port) 
@@ -1468,7 +1479,7 @@ def generate_rule_annotation_tasks(pat_model, top_level_dir, db_cred, assume_mul
         annotations = file_object[2]
         failure=file_object[4]
         file_counter +=1
-        yield(top_level_dir, file_counter, file_object, pat_model, assume_multi_tables,db_cred)
+        yield(top_level_dir, file_counter, file_object, pat_model,db_cred)
 
     cur.close()
     con.close()
@@ -1733,7 +1744,7 @@ def save_training_data(crawl_datafile_key, file_dataframe_trimmed, annotations, 
 
 def pat_rule_worker(task):
     start=timer()
-    top_level_dir, file_counter, file_object, pat_classifier, assume_multi_tables,db_cred = task
+    top_level_dir, file_counter, file_object, pat_classifier, db_cred = task
     # if file_counter%100==0:
     #     print(f'file_counter={file_counter}')
     max_attributes= pat_classifier.parameters.max_attributes    
@@ -1748,12 +1759,12 @@ def pat_rule_worker(task):
     lines_in_file = len(file_dataframe)
 
     bottom_boundary = file_dataframe.shape[0]-1 #initialize
-    if assume_multi_tables==False:
-        if 'tables' in annotations.keys():
-            for table in annotations['tables']:
-                if 'data_start' in table.keys():
-                    bottom_boundary = table['bottom_boundary']
-                break
+    # if assume_multi_tables==False:
+    #     if 'tables' in annotations.keys():
+    #         for table in annotations['tables']:
+    #             if 'data_start' in table.keys():
+    #                 bottom_boundary = table['bottom_boundary']
+    #             break
 
     file_dataframe = file_dataframe.loc[:bottom_boundary]
     file_dataframe_trimmed= file_dataframe.copy()
@@ -1813,7 +1824,7 @@ def discover_next_table(csv_file, file_offset, table_counter, data_rules_fired, 
     start = timer()
     combined_data_line_confidences, line_predictions = predict_combined_data_confidences(csv_file, 
                                                                                         data_line_confidences, 
-                                                                                        not_data_line_confidences,  
+                                                                                        not_data_line_confidences, 
                                                                                         parameters.max_candidates)
     end = timer()
 
@@ -1821,7 +1832,8 @@ def discover_next_table(csv_file, file_offset, table_counter, data_rules_fired, 
                                                                         csv_file, line_predictions, 
                                                                         parameters.markov_approximation_probabilities, 
                                                                         parameters.markov_model, 
-                                                                        2, parameters.combined_label_weight)
+                                                                        2, 
+                                                                        parameters.combined_label_weight)
 
     header_predictions= {}
     header_predictions['avg_confidence'] = first_data_line_combined_data_predictions['avg_confidence']
@@ -1844,8 +1856,7 @@ def discover_next_table(csv_file, file_offset, table_counter, data_rules_fired, 
             data_section_start = min(min(candidate_pat_sub_headers), pat_first_data_line)
         else:
             data_section_start = pat_first_data_line
-
-
+            
         predicted_pat_data_lines=[]
         
     #     # First data line predicted
@@ -1855,9 +1866,7 @@ def discover_next_table(csv_file, file_offset, table_counter, data_rules_fired, 
     #     # Predict Last data line
         
         cand_data = csv_file.loc[data_section_start:]
-        aggregation_rows, subheader_scope = predict_subheaders_new(csv_file, cand_data, candidate_pat_sub_headers, 
-                                                                    blank_lines, predicted_pat_header_indexes, 
-                                                                    model)
+        aggregation_rows, subheader_scope = predict_subheaders_new(csv_file, cand_data, candidate_pat_sub_headers, blank_lines, predicted_pat_header_indexes, model)
 
         predicted_pat_sub_headers = list(subheader_scope.keys())
         pat_last_data_line = pat_first_data_line
@@ -1866,7 +1875,8 @@ def discover_next_table(csv_file, file_offset, table_counter, data_rules_fired, 
                                                             data_line_confidences, 
                                                             not_data_line_confidences,
                                                             model, subheader_scope, 
-                                                            aggregation_rows, blank_lines, headers_discovered, signatures,
+                                                            aggregation_rows, blank_lines, 
+                                                            headers_discovered, signatures,
                                                             data_rules_fired, 
                                                             not_data_rules_fired)
 
@@ -1968,219 +1978,6 @@ def koci_to_pat_input(crawl_datafile_key, db_cred):
             line_predictions[line_index]['value']['difference']=   not_data_line_weight-data_line_weight     
 
     return line_weights, data_line_confidences, not_data_line_confidences, line_predictions, file_cells
-
-def discover_next_table_koci_input(csv_file, file_offset, table_counter, line_weights, data_line_confidences, not_data_line_confidences, line_predictions, blank_lines, headers_discovered, model):
-    parameters = model.parameters
-    # print(f'\nDiscovering table {table_counter}:\n')
-    discovered_table = None
-    csv_file = csv_file.loc[file_offset:]
-    if csv_file.empty:
-        return discovered_table
-
-    # input(f'{csv_file}\nPress enter...')
-
-    # pat_first_data_line, first_data_line_combined_data_predictions = predict_fdl(csv_file, data_line_confidences, not_data_line_confidences, combined_data_line_confidences, line_predictions, parameters.markov_approximation_probabilities, parameters.markov_model, 2, parameters.combined_label_weight)
-    pat_first_data_line, first_data_line_combined_data_predictions = predict_fdl(csv_file, line_predictions, parameters.markov_approximation_probabilities, parameters.markov_model, 2, parameters.combined_label_weight)
-
-    header_predictions= {}
-    header_predictions['avg_confidence'] = first_data_line_combined_data_predictions['avg_confidence']
-    header_predictions['min_confidence'] = first_data_line_combined_data_predictions['min_confidence']
-    header_predictions['softmax'] = first_data_line_combined_data_predictions['softmax']
-    header_predictions['prod_softmax_prior']= first_data_line_combined_data_predictions['prod_softmax_prior']
-
-    
-    predicted_pat_header_indexes= []
-    candidate_pat_sub_headers= []
-    predicted_pat_sub_headers= []
-
-    # input(f'pat_first_data_line={pat_first_data_line}')
-
-    if pat_first_data_line>=0:
-        predicted_pat_header_indexes, candidate_pat_sub_headers = predict_header_indexes(csv_file, pat_first_data_line, table_counter)
-        candidate_pat_sub_headers.sort()
-        for h in predicted_pat_header_indexes:
-            headers_discovered[h] = ','.join(csv_file.loc[h].apply(str).tolist())
-
-        # input(f'\n\t ->candidate_pat_sub_headers (from predict_header_indexes)={candidate_pat_sub_headers}')
-
-        if len(candidate_pat_sub_headers)>0:
-            data_section_start = min(min(candidate_pat_sub_headers), pat_first_data_line)
-        else:
-            data_section_start = pat_first_data_line
-
-        # print(f'\n\t pat_first_data_line={pat_first_data_line}')
-        # print(f'\n\t data_section_start={data_section_start}')
-        # print(f'\n\t predicted_pat_header_indexes={predicted_pat_header_indexes}\n')
-
-        predicted_pat_data_lines=[]
-        discovered_table={}
-        discovered_table['top_boundary'] = file_offset
-        discovered_table['data_start'] = data_section_start
-        discovered_table['fdl_confidence']= dict()
-        discovered_table['fdl_confidence']["avg_majority_confidence"]=float(first_data_line_combined_data_predictions["avg_confidence"]['confidence'])
-        discovered_table['fdl_confidence']["avg_difference"]=float(first_data_line_combined_data_predictions["avg_confidence"]['difference'])
-        discovered_table['fdl_confidence']["avg_confusion_index"]=float(first_data_line_combined_data_predictions["avg_confidence"]['confusion_index'])
-        discovered_table['fdl_confidence']["softmax"]=float(first_data_line_combined_data_predictions['softmax'])
-        discovered_table['header'] = predicted_pat_header_indexes
-        
-    #     # First data line predicted successfully
-    #     ##############################################################################
-    #     # Predict Last data line
-        
-        cand_data = csv_file.loc[data_section_start:]
-        aggregation_rows = dict()
-
-        pat_last_data_line = pat_first_data_line
-        candidate_sub_headers = list(set(candidate_pat_sub_headers+list(cand_data.index[cand_data.iloc[:,1:].isnull().all(1)])))
-
-        pat_last_data_line = predict_last_data_line_top_down_koci(csv_file, pat_first_data_line, line_predictions, model.parameters, candidate_sub_headers, aggregation_rows,blank_lines, headers_discovered)
-
-        predicted_pat_data_lines = list(range(data_section_start, pat_last_data_line+1)) 
-        for blank_line_idx in blank_lines:
-            if blank_line_idx in predicted_pat_data_lines:
-                predicted_pat_data_lines.remove(blank_line_idx) 
-
-        discovered_table['data_end'] = pat_last_data_line
-                
-    #     # Last data line predicted
-    #     ###############################################################################
-        cand_data = csv_file.loc[data_section_start:pat_last_data_line]
-        candidate_pat_sub_headers = sorted(list(set(candidate_pat_sub_headers).intersection(set(predicted_pat_data_lines))))
-        candidate_pat_sub_headers = list(set(candidate_pat_sub_headers+list(cand_data.index[cand_data.iloc[:,1:].isnull().all(1)])))
-        aggregation_scope, subheader_scope = predict_subheaders_koci(csv_file, cand_data, candidate_pat_sub_headers, blank_lines, predicted_pat_header_indexes, model.parameters)
-        predicted_pat_sub_headers = subheader_scope.keys()
-
-        discovered_table['subheader_scope'] = subheader_scope
-        discovered_table['aggregation_scope'] = aggregation_scope
-
-        for subheaders_idx in predicted_pat_sub_headers:
-            if subheaders_idx in predicted_pat_data_lines:
-                predicted_pat_data_lines.remove(subheaders_idx)
-        # input(f'\npredicted_pat_sub_headers={predicted_pat_sub_headers}\n')             
-        discovered_table['footnotes'] = []
-    return discovered_table
-
-
-def predict_subheaders_koci(csv_file, cand_data, predicted_pat_sub_headers, pat_blank_lines, pat_headers, args):
-
-    cand_subhead_indexes = predicted_pat_sub_headers
-    cand_subhead_indexes.sort()
-
-    candidate_subheaders = dict()
-    subheader_scope=dict()
-    certain_data_indexes = list(cand_data.index)
-    aggregation_rows=dict()
-    first_column_data_values= []
-    
-    for row in cand_data.loc[certain_data_indexes].itertuples():
-        first_value = str(row[1]).strip()    
-        first_value_tokens = first_value.lower().split()  
-        for aggregation_phrase in pat_util.aggregation_functions:
-            agg_index = first_value.lower().find(aggregation_phrase[0])
-            if agg_index>-1:                
-                aggregation_rows[row.Index]={}
-                aggregation_rows[row.Index]['value']=first_value
-                aggregation_rows[row.Index]['aggregation_function'] = aggregation_phrase[1]
-                aggregation_rows[row.Index]['aggregation_phrase'] = aggregation_phrase[0]
-                aggregation_rows[row.Index]['aggregation_label'] = first_value[:agg_index]+first_value[agg_index+len(aggregation_phrase[0]):]
-                break
-
-        if row.Index not in aggregation_rows.keys() and first_value.lower() not in pat_util.null_equivalent_values and row.Index not in cand_subhead_indexes:
-            first_column_data_values.append(first_value)
-
-    certain_data_indexes = list(set(certain_data_indexes) - set(aggregation_rows.keys()) - set(cand_subhead_indexes))
-
-    for row in csv_file.loc[cand_subhead_indexes].itertuples():
-        first_value = str(row[1]).strip()
-        if first_value.lower() not in  ['nan', 'none', ''] and row.Index not in aggregation_rows.keys():
-            candidate_subheaders[row.Index] = first_value
-
-    cand_subhead_indexes = list(candidate_subheaders.keys())
-    aggregation_rows, certain_data_indexes, predicted_pat_sub_headers, cand_subhead_indexes, subheader_scope = discover_aggregation_scope(csv_file.loc[:cand_data.index[-1]], aggregation_rows, candidate_subheaders, predicted_pat_sub_headers, certain_data_indexes, pat_headers)
-
-    if cand_subhead_indexes!=None and len(cand_subhead_indexes)>0:
-        first_column_value_patterns=[]
-        first_column_value_symbols=[]
-        first_column_value_cases=[]
-        first_column_value_token_lengths=[]
-        first_column_value_char_lengths=[]
-        first_column_value_tokens=[]
-
-
-        for value in first_column_data_values:
-            pattern, symbols, case, value_num_tokens, value_num_chars = pat_util.generate_pattern_symbols_and_case(str(value).strip(), args.outlier_sensitive)
-            first_column_value_patterns.append(pattern)
-            first_column_value_symbols.append(symbols)
-            first_column_value_cases.append(case)
-            first_column_value_token_lengths.append(value_num_tokens)
-            first_column_value_char_lengths.append(value_num_chars)
-            # first_column_value_tokens.append([i for i in word_tokenize(str(value).strip().lower()) if i not in stop and i.isalpha() and i not in pat_util.null_equivalent_values])
-            first_column_value_tokens.append([i for i in (str(value).strip().lower()).split() if i not in stop and all(j.isalpha() or j in string.punctuation for j in i) and i not in pat_util.null_equivalent_values] )
-
-        if args.normalize_decimals==True:   
-            first_column_value_patterns,first_column_value_symbols=pat_util.normalize_decimals_numbers(first_column_value_patterns, first_column_value_symbols)
-
-        value_pattern_summary, value_chain_consistent = pat_util.generate_pattern_summary(first_column_value_patterns)            
-        summary_strength = sum(1 for x in first_column_value_patterns if len(x)>0)
-        bw_patterns = [list(reversed(pattern)) for pattern in first_column_value_patterns]
-        value_pattern_BW_summary,_=pat_util.generate_pattern_summary(bw_patterns)
-
-        # input(f'value_pattern_BW_summary={value_pattern_BW_summary}')
-
-        value_symbol_summary = pat_util.generate_symbol_summary(first_column_value_symbols)
-        case_summary = pat_util.generate_case_summary(first_column_value_cases)
-        length_summary = pat_util.generate_length_summary(first_column_value_char_lengths)
-
-        
-        for row in csv_file.loc[cand_subhead_indexes].itertuples():
-            first_value = str(row[1]).strip()
-            if first_value.lower() in ['', 'nan', 'none', 'null']:
-                continue
-            if first_value in first_column_data_values:
-                continue
-            if row.Index-1 in pat_blank_lines or row.Index-1 in pat_headers:
-                predicted_pat_sub_headers.append(row.Index)
-            else: 
-
-                value_tokens = first_value.lower().split() 
-                pattern, symbols, case, value_num_tokens, value_num_chars = pat_util.generate_pattern_symbols_and_case(str(first_value).strip(), args.outlier_sensitive)
-                if args.normalize_decimals==True:                    
-                    column_patterns, column_symbols=pat_util.normalize_decimals_numbers( [pattern]+first_column_value_patterns,  [symbols]+first_column_value_symbols)
-                value_pattern_summary, value_chain_consistent = pat_util.generate_pattern_summary(column_patterns) 
-
-                summary_strength = sum(1 for x in column_patterns if len(x)>0)           
-                bw_patterns = [list(reversed(pattern)) for pattern in column_patterns]
-                value_pattern_BW_summary,_=pat_util.generate_pattern_summary(bw_patterns)
-                value_symbol_summary = pat_util.generate_symbol_summary(column_symbols)
-                case_summary = pat_util.generate_case_summary([case]+ first_column_value_cases)
-                length_summary = pat_util.generate_length_summary( [value_num_chars]+first_column_value_char_lengths) 
-                column_values = [first_value] + first_column_data_values 
-                column_tokens = [value_tokens] + first_column_value_tokens          
-
-                if (row.Index-1 in predicted_pat_sub_headers and row.Index-2 in predicted_pat_sub_headers):
-                    continue  
-
-                if row.Index!=cand_data.index[-1]:
-                    predicted_pat_sub_headers.append(row.Index)
-
-    # print(f'predicted_pat_sub_headers={predicted_pat_sub_headers}')              
-    for s_i, subheader in enumerate(predicted_pat_sub_headers):
-        if subheader not in subheader_scope.keys():
-            if s_i+1==len(predicted_pat_sub_headers):
-                subheader_scope[subheader] = list(range(subheader+1,cand_data.index[-1]+1))
-            else:
-                next_s_i = s_i+1
-                while next_s_i<len(predicted_pat_sub_headers):
-                    next_subh = predicted_pat_sub_headers[next_s_i]
-                    if next_subh not in subheader_scope:
-                        subheader_scope[subheader] = list(range(subheader+1,next_subh))
-                        break
-                    next_s_i+=1            
-            
-    return  aggregation_rows, subheader_scope
-
-
-
 
 def predict_subheaders(csv_file, cand_data, predicted_pat_sub_headers, pat_blank_lines, pat_headers, model):
     ignore_rules=model.ignore_rules
@@ -2719,10 +2516,14 @@ def predict_last_data_line_top_down(dataframe, predicted_fdl, data_confidence, n
         FOOTNOTE_FOUND= False
         data_conf=0
         not_data_conf=0
-
+        
+        # input()
+        # print(f'\n---------------\nLINE {line_label}: IS_DATA init {IS_DATA}')
+        # print(f'{row_values}')
         if line_label not in blank_lines: 
             if line_label in certain_data:
                 IS_DATA = True
+                # print(f'(1) IS_DATA = True')
                 data_conf=1
 
             if line_label in predicted_pat_sub_headers:
@@ -2730,7 +2531,7 @@ def predict_last_data_line_top_down(dataframe, predicted_fdl, data_confidence, n
                     if first_value.startswith(footnote_keyword):
                         FOOTNOTE_FOUND= True
                         not_data_conf=1
-                        break
+                        break #stop looking for footnote keywords
                 if len(first_value)>5 and ( ( (first_value[0]=='1' or first_value[0]=='a' ) and first_value[1] in [' ', '.', '/', ')', ']', ':'] ) or (first_value[0]=='(' and ( first_value[1].isdigit() or first_value[1]=='a' ) and first_value[2]==')') ):
                     FOOTNOTE_FOUND = True
                     not_data_conf=1
@@ -2742,10 +2543,13 @@ def predict_last_data_line_top_down(dataframe, predicted_fdl, data_confidence, n
                     continue
 
             if len(row_values)>0 and row_values[0].lower() not in ['','none', 'nan'] and ((len(row_values)>1 and len([i for i in row_values[1:] if i.lower() not in  ['','none', 'nan']])==0) or (len(row_values)>2 and len([i for i in row_values[2:] if i.lower() not in  ['','none', 'nan']])==0)):
-                IS_DATA = True                  
+                # IS_DATA = True   
+                
+                # print(f'(2) IS_DATA = True')               
                 for footnote_keyword in pat_util.footnote_keywords:
                     if first_value.startswith(footnote_keyword):
                         FOOTNOTE_FOUND = True
+                        # print('### footnote found')
                         break
 
                 if '=' in first_value:
@@ -2757,9 +2561,13 @@ def predict_last_data_line_top_down(dataframe, predicted_fdl, data_confidence, n
                 if len(first_value)>5 and (first_value[0]=='('  and (  first_value[1]=='1' or first_value[1]=='a' )  and first_value[2]==')' ):
                     FOOTNOTE_FOUND = True
 
+                if first_value.startswith('(') and len(row_values)>1 and len([i for i in row_values[1:] if i !='nan'])==0:
+                    FOOTNOTE_FOUND = True
+
                 if FOOTNOTE_FOUND == True:
                     footnote_start = line_label
-                    IS_DATA=False
+                    IS_DATA = False
+                    # print(f'FOOTNOTE_FOUND, IS_DATA = False') 
                     not_data_conf=1
                     prediction, _ = predict_line_label(data_conf, not_data_conf)
                     data_predictions[line_label]=prediction
@@ -2780,10 +2588,12 @@ def predict_last_data_line_top_down(dataframe, predicted_fdl, data_confidence, n
                 if line.isnull().values.all()==True:
                     prediction, _ = predict_line_label(data_conf, not_data_conf)
                     data_predictions[line_label]=prediction
+                    # print('line.isnull().values.all()==True, line = {line}')
                     continue
 
                 elif ','.join(line.apply(str).tolist()) in set(headers_discovered.values()):
                     IS_DATA = False
+                    # print(f'headers_discovered, IS_DATA = False') 
                 else:
                     data_rules_fired, not_data_rules_fired, patterns = collect_line_rules(line, 
                                                                                             predicted_fdl,
@@ -2849,18 +2659,24 @@ def predict_last_data_line_top_down(dataframe, predicted_fdl, data_confidence, n
                     # calculate confidence that this row is data
                     data_conf = probabilistic_sum(line_is_data_evidence)
 
+                    # print(f'{line_label}: \n\t-data_conf={data_conf}\n\t-not_data_conf={not_data_conf}')
                     if (data_conf>0 and data_conf>=not_data_conf):
-                        IS_DATA=True     
+                        IS_DATA=True  
+                        # print(f'(3) IS_DATA = True (data_conf>0 and data_conf>=not_data_conf)')
                     elif len(certain_data_widths)>0 and non_empty_values(line)==max(certain_data_widths) and line_label-1 in data.index: #TODO refactor as rule
-                        IS_DATA=True                    
+                        IS_DATA=True  
+                        # print(f'(4) IS_DATA = True')                  
                     else:
                         prediction, _ = predict_line_label(data_confidence[line_label], not_data_confidence[line_label])
                         if line_label-1 not in probation and line_label-1 not in blank_lines and data_conf<not_data_conf and prediction['label']!='DATA':
                             probation.append(line_label)
                         elif (data_conf>0 and data_conf>=not_data_conf) or (line_label-1 not in probation and prediction['label']=='DATA'):
                             IS_DATA=True
+                            # print(f'(5) IS_DATA = True')
+                            
 
-            
+            # print(f'\t{line_label} IS_DATA={IS_DATA}\n')
+
             #--- end if blanklines
             if line_label in probation:
                 prediction, _ = predict_line_label(data_conf, not_data_conf)
@@ -3669,9 +3485,14 @@ def collect_dataframe_rules(csv_file, model, signatures):
                 not_data_rules_fired[line_index]['line'].append(rule)
 
     return data_rules_fired, not_data_rules_fired
+
+def combined_table_confidence(top, bottom):
+    return min(top, bottom)
+
 def convert(o):
     if isinstance(o, np.int64): return int(o)  
     raise TypeError
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()    
