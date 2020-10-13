@@ -1,0 +1,14 @@
+# ignore CSV files and annotations for training Pytheas,
+data/Canada
+data/examples/*
+# ignore all data except demo
+!data/examples/demo.csv
+!data/examples/demo.json
+
+# ignore evaluation
+src/evaluation
+
+# ignore script for converting annotations in psql
+# to two folders: a) csv files, b) json files (annotations)
+src/pytheas/save_training_input.py
+
