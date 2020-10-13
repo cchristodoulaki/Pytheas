@@ -1,6 +1,10 @@
 */__pycache__/
 src/pytheas/__pycache__/
 
+# ignore visual studio code workspace
+pytheas.workspace.code-workspace
+
+
 # ignore CSV files and annotations for training Pytheas,
 data/Canada
 data/examples/*
