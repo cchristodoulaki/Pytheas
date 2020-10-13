@@ -1,4 +1,4 @@
-*/__pycache__/*
+*__pycache__/*
 
 # ignore CSV files and annotations for training Pytheas,
 data/Canada
