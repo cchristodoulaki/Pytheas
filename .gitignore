@@ -1,6 +1,9 @@
 */__pycache__/
 src/pytheas/__pycache__/
 
+# ignore virtual environment
+pytheas-env/
+
 # ignore visual studio code workspace
 pytheas.workspace.code-workspace
 
