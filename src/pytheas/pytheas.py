@@ -78,43 +78,43 @@ def process_endpoint(endpoint,
                         top_level_dir = '/home/christina/OPEN_DATA_CRAWL_2018', 
                         max_lines=None):    
 
-    pytheas_model = PYTHEAS()
+    # pytheas_model = PYTHEAS()
 
-    print('\nLoading CACHED Training Data...')
+    # print('\nLoading CACHED Training Data...')
 
-    con=connect(dbname=db_cred.database, 
-                user=db_cred.user, 
-                host = 'localhost', 
-                password=db_cred.password, 
-                port = db_cred.port)
+    # con=connect(dbname=db_cred.database, 
+    #             user=db_cred.user, 
+    #             host = 'localhost', 
+    #             password=db_cred.password, 
+    #             port = db_cred.port)
 
-    undersampled_cell_data = pd.read_sql_query(
-            sql = f"SELECT * FROM pat_data_cell_rules WHERE undersample=True", con=con)
-    con.close()
+    # undersampled_cell_data = pd.read_sql_query(
+    #         sql = f"SELECT * FROM pat_data_cell_rules WHERE undersample=True", con=con)
+    # con.close()
 
-    con=connect(dbname=db_cred.database, user=db_cred.user, host = 'localhost', password=db_cred.password, port = db_cred.port)
-    undersampled_line_data = pd.read_sql_query(
-            sql = f"SELECT * FROM pat_data_line_rules WHERE undersample=True", con=con)
-    con.close()
+    # con=connect(dbname=db_cred.database, user=db_cred.user, host = 'localhost', password=db_cred.password, port = db_cred.port)
+    # undersampled_line_data = pd.read_sql_query(
+    #         sql = f"SELECT * FROM pat_data_line_rules WHERE undersample=True", con=con)
+    # con.close()
 
-    con=connect(dbname=db_cred.database, user=db_cred.user, host = 'localhost', password=db_cred.password, port = db_cred.port)
-    undersampled_cell_not_data = pd.read_sql_query(
-            sql = f"SELECT * FROM pat_not_data_cell_rules WHERE undersample=True", con=con)
-    con.close()
+    # con=connect(dbname=db_cred.database, user=db_cred.user, host = 'localhost', password=db_cred.password, port = db_cred.port)
+    # undersampled_cell_not_data = pd.read_sql_query(
+    #         sql = f"SELECT * FROM pat_not_data_cell_rules WHERE undersample=True", con=con)
+    # con.close()
 
-    con=connect(dbname=db_cred.database, user=db_cred.user, host = 'localhost', password=db_cred.password, port = db_cred.port)
-    undersampled_line_not_data = pd.read_sql_query(
-            sql = f"SELECT * FROM pat_not_data_line_rules WHERE undersample=True", con=con)
-    con.close()
+    # con=connect(dbname=db_cred.database, user=db_cred.user, host = 'localhost', password=db_cred.password, port = db_cred.port)
+    # undersampled_line_not_data = pd.read_sql_query(
+    #         sql = f"SELECT * FROM pat_not_data_line_rules WHERE undersample=True", con=con)
+    # con.close()
 
-    print('\nTraining model...')
-    start = timer()
-    pytheas_model.train_rules(undersampled_cell_data, 
-                                undersampled_cell_not_data, 
-                                undersampled_line_data, 
-                                undersampled_line_not_data)
-    end = timer()
-    print(f'\nModel trained in {timedelta(seconds=end - start)}.')
+    # print('\nTraining model...')
+    # start = timer()
+    # pytheas_model.train_rules(undersampled_cell_data, 
+    #                             undersampled_cell_not_data, 
+    #                             undersampled_line_data, 
+    #                             undersampled_line_not_data)
+    # end = timer()
+    # print(f'\nModel trained in {timedelta(seconds=end - start)}.')
 
     with opendata_engine.connect() as conn:
         endpoint_data = pd.read_sql_query(sql = f"""
@@ -3503,6 +3503,7 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--csv_files", default = None)#, description="Filepath to folder with CSV training files")
     parser.add_argument("-a", "--annotations", default = None)#, description="Filepath to folder with JSON annotations over CSV training files")
 
+
     args = parser.parse_args(sys.argv[1:])
     command = args.command
     weights = args.weights
@@ -3529,6 +3530,8 @@ if __name__ == "__main__":
             Pytheas = API()
             Pytheas.learn_and_save_weights(csv_files, 
             annotations, output_file)
+
+
 
 
     
