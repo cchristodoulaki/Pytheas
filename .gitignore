@@ -7,6 +7,8 @@ pytheas-env/
 # ignore visual studio code workspace
 pytheas.workspace.code-workspace
 
+# ignore database credentials
+src/database_credentials.json
 
 # ignore CSV files and annotations for training Pytheas,
 data/Canada
