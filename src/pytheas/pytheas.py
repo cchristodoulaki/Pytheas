@@ -38,7 +38,7 @@ stop = stopwords.words('french')+stopwords.words('english')+list(string.punctuat
 import nb_utilities as nb_util
 import file_utilities
 import table_classifier_utilities
-from table_classifier_utilities import TableSignatures, is_consistent_symbol_sets, predict_fdl, predict_line_label, predict_combined_data_confidences, predict_header_indexes, eval_data_cell_rule, eval_not_data_cell_rule, line_has_null_equivalent, all_numbers, is_number, assess_data_line, assess_non_data_line,non_nulls_in_line, discover_aggregation_scope, contains_number
+from table_classifier_utilities import TableSignatures, is_consistent_symbol_sets, predict_fdl, predict_line_label, predict_combined_data_confidences, predict_header_indexes, eval_data_cell_rule, eval_not_data_cell_rule, line_has_null_equivalent, all_numbers, is_number, assess_data_line, assess_non_data_line,non_nulls_in_line, discover_aggregation_scope, contains_number, combo_row
 import pat_utilities as pat_util
 from header_events import collect_events_on_row, collect_arithmetic_events_on_row, header_row_with_aggregation_tokens
 sys.path.append('../evaluation')
@@ -51,7 +51,7 @@ pp = pprint.PrettyPrinter(indent=4)
 import os
 import re
 import subprocess
-
+import random
 
 # Database connection credentials
 db_cred = DotMap()
@@ -72,92 +72,7 @@ def generate_processing_tasks(pytheas_model, db_cred, files, max_lines, top_leve
         task = (db_cred, file_counter, pytheas_model, crawl_datafile_key, endpoint, filepath, max_lines)
         yield task  
 
-def process_endpoint(endpoint, 
-                        db_cred, 
-                        NPROC = 4,
-                        top_level_dir = '/home/christina/OPEN_DATA_CRAWL_2018', 
-                        max_lines=None):    
 
-    # pytheas_model = PYTHEAS()
-
-    # print('\nLoading CACHED Training Data...')
-
-    # con=connect(dbname=db_cred.database, 
-    #             user=db_cred.user, 
-    #             host = 'localhost', 
-    #             password=db_cred.password, 
-    #             port = db_cred.port)
-
-    # undersampled_cell_data = pd.read_sql_query(
-    #         sql = f"SELECT * FROM pat_data_cell_rules WHERE undersample=True", con=con)
-    # con.close()
-
-    # con=connect(dbname=db_cred.database, user=db_cred.user, host = 'localhost', password=db_cred.password, port = db_cred.port)
-    # undersampled_line_data = pd.read_sql_query(
-    #         sql = f"SELECT * FROM pat_data_line_rules WHERE undersample=True", con=con)
-    # con.close()
-
-    # con=connect(dbname=db_cred.database, user=db_cred.user, host = 'localhost', password=db_cred.password, port = db_cred.port)
-    # undersampled_cell_not_data = pd.read_sql_query(
-    #         sql = f"SELECT * FROM pat_not_data_cell_rules WHERE undersample=True", con=con)
-    # con.close()
-
-    # con=connect(dbname=db_cred.database, user=db_cred.user, host = 'localhost', password=db_cred.password, port = db_cred.port)
-    # undersampled_line_not_data = pd.read_sql_query(
-    #         sql = f"SELECT * FROM pat_not_data_line_rules WHERE undersample=True", con=con)
-    # con.close()
-
-    # print('\nTraining model...')
-    # start = timer()
-    # pytheas_model.train_rules(undersampled_cell_data, 
-    #                             undersampled_cell_not_data, 
-    #                             undersampled_line_data, 
-    #                             undersampled_line_not_data)
-    # end = timer()
-    # print(f'\nModel trained in {timedelta(seconds=end - start)}.')
-
-    with opendata_engine.connect() as conn:
-        endpoint_data = pd.read_sql_query(sql = f"""
-        SELECT datafile_key as crawl_datafile_key, num_lines, size_bytes as size_in_bytes, path , endpoint_dbname
-        FROM datafile
-        WHERE endpoint_dbname in (%s)
-            AND lower(path) not like '%%meta%%' 
-            AND num_lines>10000
-            AND num_lines_processed<=10000
-            AND failure is null
-        ORDER BY num_lines
-        """, con=conn, params=(', '.join(endpoint),))
-        # AND is_processed = False
-        # ORDER BY size_bytes
-
-
-
-                            
-        files = [[x.crawl_datafile_key, x.size_in_bytes, x.path, x.endpoint_dbname] for x in endpoint_data.itertuples()]
-
-        NINPUTS = len(files)
-        message_slack(f'Started processing {NINPUTS} files.')        
-        print(f'NINPUTS={NINPUTS}')
-        print(f'NPROC={NPROC}')
-        # Process files
-        processed=0
-        with Pool(processes=NPROC) as pool:
-            with tqdm(total=NINPUTS) as pbar:
-                for _ in pool.imap_unordered(process_file_worker, 
-                                            generate_processing_tasks(pytheas_model,
-                                                                    db_cred, 
-                                                                    files, 
-                                                                    max_lines, 
-                                                                    top_level_dir )
-                                            ):
-                    pbar.update(1) 
-                    processed+=1
-                    if processed%100==0:
-                        message_slack(f'Completed {processed} of {NINPUTS} files ({round(100*processed/NINPUTS,2)}%) :margarita-parrot:')
-                    elif processed%50==0:
-                        message_slack(f'Completed {processed} of {NINPUTS} files ({round(100*processed/NINPUTS,2)}%) :mask-parrot:')
-
-        message_slack(f'Completed {processed} of {NINPUTS} files ({processed/NINPUTS}%) :deal-with-it-parrot:.')
 
 def message_slack(message):
     headers = {
@@ -167,7 +82,7 @@ def message_slack(message):
     requests.post('https://hooks.slack.com/services/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', headers=headers, data=str(data)) 
 
 def process_file_worker(t):
-    
+    row_sample_size=20
     db_cred, file_counter, pytheas_model, crawl_datafile_key,endpoint, filepath, max_lines = t 
     discovered_delimiter = None
     discovered_encoding = None
@@ -203,7 +118,6 @@ def process_file_worker(t):
                     file_dataframe = file_utilities.merged_df(failure, all_csv_tuples)
                     
                     last_line_processed, file_num_columns = file_dataframe.shape
-
 
                     blank_lines=[]
                     blank_lines=list(file_dataframe[file_dataframe.isnull().all(axis=1)].index) 
@@ -242,37 +156,7 @@ def process_file_worker(t):
             ## Delete any tables discovered from the files you will process
             conn.execute(f"""DELETE FROM datatable 
                         WHERE datafile = {crawl_datafile_key}""")
-            sql = """ 
-            UPDATE datafile 
-            SET is_processed=%s,
-                delimiter=%s,
-                encoding=%s,
-                num_lines_processed=%s,
-                last_line_processed=%s,
-                num_tables=%s,
-                failure=%s,
-                traceback=%s,
-                processing_time_sec=%s, 
-                processing_time_min=%s,
-                first_table_fdl_confidence=%s,
-                num_columns=%s,
-                max_columns_processed=%s
-            WHERE datafile_key = %s
-            """
-            conn.execute(sql, (True,
-                              discovered_delimiter,
-                              discovered_encoding,
-                              num_lines_processed, # number of lines sampled
-                              last_line_processed, # number of legit lines in sample (trim off excess blank rows) 
-                              num_tables,
-                              failure,
-                              traceback_str,
-                              processing_time, 
-                              processing_time/60,
-                              first_table_fdl_confidence,
-                              file_num_columns,# width of dataframe
-                              file_max_columns_processed, # width of dataframe processed by pytheas
-                              crawl_datafile_key))
+
 
             if predictions != None:             
                 sql="""INSERT INTO datatable (  endpoint_dbname,
@@ -298,10 +182,9 @@ def process_file_worker(t):
                     from_index = table["data_start"]
                     to_index = table["data_end"]
                     table_dataframe=file_dataframe.loc[from_index:to_index]
-                    
-                    table_dataframe=table_dataframe.dropna(axis='columns', 
-                                                           how='all')#TODO reconsider
-                    num_rows,num_columns=table_dataframe.shape
+                    # remove columns that are empty
+                    table_dataframe = table_dataframe.dropna(axis='columns', how='all')#TODO reconsider
+                    num_rows, num_columns=table_dataframe.shape
                     header_lines = table["header"]
                     
                     if len(header_lines)>0:
@@ -315,10 +198,26 @@ def process_file_worker(t):
                     first_5_rows=str([tuple(x) for x in table_dataframe.head().values] )
                     
                     first_data_line_confidence=float(round(table["fdl_confidence"]['avg_majority_confidence'],4))
-                    header_length=len(
-                                    file_dataframe.loc[header_lines].dropna(
-                                                                        axis='rows', 
-                                                                        how='all'))
+                    header_dataframe = file_dataframe.loc[header_lines]
+                    header_length=len(header_dataframe.dropna(axis='rows', how='all'))
+
+                    column_names = combo_row(header_dataframe) #apply combination algorithm to values in discovered header section
+
+                    # Comment out unfinished project
+                    # predictions[table_id]["columns"] = {}
+                    # sample_rows = random.sample(table_dataframe.index, min(len(table_dataframe), row_sample_size))
+                    # patterns = Patterns()
+                    # for index, column_name in enumerate(table_dataframe.index):
+                    #     column_combo_name = column_names[index]
+                    #     column = {}
+                    #     column["csv_index"] = column_name
+                    #     column["combo_name"] = column_combo_name
+                    #     column["patterns"] = patterns.generate_column_patterns(table_dataframe.loc[sample_rows, [column_name]]).summary
+
+                    #     predictions[table_id]["columns"][index] = column
+                    predictions[table_id]["header_lines"] = header_dataframe.to_json(orient='split')
+
+
                     first_data_line_avg_majority_confidence=float(round(table["fdl_confidence"]['avg_majority_confidence'],4))
                     first_data_line_avg_difference=float(round(table["fdl_confidence"]['avg_difference'],4))
                     first_data_line_avg_confusion_index=float(round(table["fdl_confidence"]['avg_confusion_index'],4))
@@ -354,8 +253,43 @@ def process_file_worker(t):
                                                    , footnotes_idx
                                                     )
                                                 )
+            ## Now that we have recorded all tables, we can update the datafile too
+            sql = """ 
+            UPDATE datafile 
+            SET is_processed=%s,
+                delimiter=%s,
+                encoding=%s,
+                num_lines_processed=%s,
+                last_line_processed=%s,
+                num_tables=%s,
+                failure=%s,
+                traceback=%s,
+                processing_time_sec=%s, 
+                processing_time_min=%s,
+                first_table_fdl_confidence=%s,
+                num_columns=%s,
+                max_columns_processed=%s,
+                pytheas_annotations = %s
+            WHERE datafile_key = %s
+            """
+            conn.execute(sql, (True,
+                              discovered_delimiter,
+                              discovered_encoding,
+                              num_lines_processed, # number of lines sampled
+                              last_line_processed, # number of legit lines in sample (trim off excess blank rows) 
+                              num_tables,
+                              failure,
+                              traceback_str,
+                              processing_time, 
+                              processing_time/60,
+                              first_table_fdl_confidence,
+                              file_num_columns,# width of dataframe
+                              file_max_columns_processed, # width of dataframe processed by pytheas
+                              Json(convert_predictions(predictions, blank_lines, last_line_processed, file_num_columns, file_max_columns_processed)),
+                              crawl_datafile_key))                                    
     return predictions, processing_time
 
+  
 
 def available_cpu_count():
     """ Number of available virtual or physical CPUs on this system, i.e.
@@ -1063,14 +997,63 @@ class PYTHEAS:
             self.fuzzy_rules["line"]["not_data"][rule]["confidence"]=confidence 
             self.fuzzy_rules["line"]["not_data"][rule]["coverage"]=coverage   
     
+    def process_endpoint(self, endpoint, 
+                            db_cred, 
+                            NPROC = 4,
+                            top_level_dir = '/home/christina/OPEN_DATA_CRAWL_2018', 
+                            max_lines=None):    
 
+        with opendata_engine.connect() as conn:
+            endpoint_data = pd.read_sql_query(sql = f"""
+            SELECT datafile_key as crawl_datafile_key, num_lines, size_bytes as size_in_bytes, path, endpoint_dbname
+            FROM datafile
+            WHERE endpoint_dbname in (%s)
+                AND lower(path) not like '%%meta%%' 
+                AND num_lines>%s
+                AND num_lines_processed<=%s
+                AND failure is null
+            ORDER BY num_lines
+            """, con=conn, params=(', '.join(endpoint),
+                                    max_lines, 
+                                    max_lines))
+            # AND is_processed = False
+            # ORDER BY size_bytes
+                                
+            files = [[x.crawl_datafile_key, x.size_in_bytes, x.path, x.endpoint_dbname] for x in endpoint_data.itertuples()]
+
+            NINPUTS = len(files)
+            message_slack(f'Started processing {NINPUTS} files.')        
+            print(f'NINPUTS={NINPUTS}')
+            print(f'NPROC={NPROC}')
+            # Process files
+            processed=0
+            with Pool(processes=NPROC) as pool:
+                with tqdm(total=NINPUTS) as pbar:
+                    for _ in pool.imap_unordered(process_file_worker, 
+                                                generate_processing_tasks(self,
+                                                                        db_cred, 
+                                                                        files, 
+                                                                        max_lines, 
+                                                                        top_level_dir )
+                                                ):
+                        pbar.update(1) 
+                        processed+=1
+                        if processed%100==0:
+                            message_slack(f'Completed {processed} of {NINPUTS} files ({round(100*processed/NINPUTS,2)}%) :margarita-parrot:')
+                        elif processed%50==0:
+                            message_slack(f'Completed {processed} of {NINPUTS} files ({round(100*processed/NINPUTS,2)}%) :mask-parrot:')
+
+            # message_slack(f'Completed {processed} of {NINPUTS} files ({processed/NINPUTS}%) :deal-with-it-parrot:.')
+            print(f'Completed {processed} of {NINPUTS} files ({processed/NINPUTS}%) :deal-with-it-parrot:.')
+
+            
     def extract_tables(self, file_dataframe_trimmed, blank_lines, rules_fired=None):
         #initialize 
         discovered_tables= SortedDict()      
         # try:
         signatures = TableSignatures(file_dataframe_trimmed, self.parameters.outlier_sensitive)
 
-        ## KEEP RULES CACHED FOR THE ACTIVE LEARNING EXPERIMENT -- MUST BE MOVED
+        ## KEEP RULES CACHED FOR THE ACTIVE LEARNING EXPERIMENT -- MUST BE passed as argument rules_fired
         # con=connect(dbname=db_cred.database, 
         #             user=db_cred.user, 
         #             host = 'localhost', 
@@ -1206,27 +1189,7 @@ class PYTHEAS:
                     file_max_columns_processed = file_dataframe.iloc[:,:slice_idx].shape[1]
                     predictions = self.extract_tables(file_dataframe.iloc[:,:slice_idx],  blank_lines)
             
-            annotations = {}
-            annotations["blanklines"] = blank_lines
-            annotations["lines_processed"] = last_line_processed
-            annotations["columns_in_file"] = file_num_columns
-            annotations["columns_in_file_considered"] = file_max_columns_processed
-            annotations["tables"] = []
-            for key in predictions.keys():
-                table = dict()
-                table["table_counter"] = key
-                table["top_boundary"] = predictions[key]["top_boundary"]
-                table["bottom_boundary"] = predictions[key]["bottom_boundary"]
-                table["data_start"] = predictions[key]["data_start"]
-                table["data_end"] = predictions[key]["data_end"]
-                table["header"] = predictions[key]["header"]
-                table["footnotes"] = predictions[key]["footnotes"]
-                table["subheaders"] = list(predictions[key]["subheader_scope"].keys())
-                table["confidence"] = {"body_start": predictions[key]["fdl_confidence"]["avg_majority_confidence"], 
-                                       "body_end": predictions[key]["data_end_confidence"],
-                                       "body": combined_table_confidence(predictions[key]["fdl_confidence"]["avg_majority_confidence"], 
-                                                                        predictions[key]["data_end_confidence"])}
-                annotations["tables"].append(table)
+            annotations = convert_predictions(predictions, blank_lines, last_line_processed, file_num_columns, file_max_columns_processed)
 
         except Exception as e: 
             print(f'filepath={filepath} failed to process, {e}: {traceback.format_exc()}')
@@ -1463,6 +1426,30 @@ class PYTHEAS:
 
         cur.close()
         con.close() 
+
+def convert_predictions(predictions, blank_lines, last_line_processed, file_num_columns, file_max_columns_processed):
+    annotations = {}
+    annotations["blanklines"] = blank_lines
+    annotations["lines_processed"] = last_line_processed
+    annotations["columns_in_file"] = file_num_columns
+    annotations["columns_in_file_considered"] = file_max_columns_processed
+    annotations["tables"] = []
+    for key in predictions.keys():
+        table = dict()
+        table["table_counter"] = key
+        table["top_boundary"] = predictions[key]["top_boundary"]
+        table["bottom_boundary"] = predictions[key]["bottom_boundary"]
+        table["data_start"] = predictions[key]["data_start"]
+        table["data_end"] = predictions[key]["data_end"]
+        table["header"] = predictions[key]["header"]
+        table["footnotes"] = predictions[key]["footnotes"]
+        table["subheaders"] = list(predictions[key]["subheader_scope"].keys())
+        table["confidence"] = {"body_start": predictions[key]["fdl_confidence"]["avg_majority_confidence"], 
+                                "body_end": predictions[key]["data_end_confidence"],
+                                "body": combined_table_confidence(predictions[key]["fdl_confidence"]["avg_majority_confidence"], 
+                                                                predictions[key]["data_end_confidence"])}
+        annotations["tables"].append(table)  
+    return annotations  
 
 def generate_rule_annotation_tasks(pat_model, top_level_dir, db_cred):
 
@@ -2707,7 +2694,8 @@ def predict_last_data_line_top_down(dataframe, predicted_fdl, data_confidence, n
 class Patterns:
     def __init__(self):
         self.data = dict()
-        self.not_data = dict()       
+        self.not_data = dict()   
+        self.summary = dict()    
 
     def data_initialize(self, column_index, value, candidate_tokens, column_values, column_tokens, column_trains, column_bw_trains, column_symbols, column_cases, column_char_lengths, column_is_numeric_train, max_values_lookahead ):
 
@@ -2722,12 +2710,21 @@ class Patterns:
         self.data[column_index]['candidate_count'][value] = np.count_nonzero(column_values[2:min(max_values_lookahead,len(column_values))] == value)
         self.data[column_index]['consistent_symbol_sets']=is_consistent_symbol_sets(column_symbols) 
         self.data[column_index]['column_is_numeric'] = pat_util.generate_all_numeric_sig_pattern(column_is_numeric_train, [len(t) for t in column_trains])
-        self.data[column_index]['partof_multiword_value_repeats'] = dict() # TODO contributes to quadratic? ^o^
+        self.data[column_index]['partof_multiword_value_repeats'] = dict() # TODO check if this contributes to quadratic? ^o^
         for part in candidate_tokens:
             self.data[column_index]['partof_multiword_value_repeats'][part]=0
             for value_tokens in column_tokens:
                 if part in value_tokens:
                     self.data[column_index]['partof_multiword_value_repeats'][part] += 1
+
+    def generate_column_patterns(self, column_series, outlier_sensitive = True):
+        signatures = TableSignatures(column_series, outlier_sensitive)
+        self.summary['train'] = pat_util.generate_pattern_summary(signatures.all_column_train)
+        self.summary['bw_train'] =pat_util.generate_pattern_summary(signatures.all_column_bw_train)
+        self.summary['symbolset'] = pat_util.generate_symbol_summary(signatures.all_column_symbols)
+        self.summary['case'] = pat_util.generate_case_summary(signatures.all_column_cases)
+        self.summary['character_length']  = pat_util.generate_length_summary(signatures.all_column_character_lengths)
+ 
 
     def data_increment(self, column_index, value, train_sig, bw_train_sig, symbol_sig, case, num_chars_sig, numeric_train_sig, candidate_tokens): 
 
@@ -3300,7 +3297,7 @@ def collect_dataframe_rules(csv_file, model, signatures):
             patterns.data_initialize(column_index, candidate_value, candidate_tokens, 
                                     column_values, column_tokens, column_train_sigs,  column_bw_train_sigs,  
                                     column_symbols,  column_cases,  column_lengths, column_is_numeric_train,
-                                    args.max_summary_strength )
+                                    args.max_summary_strength)
 
             # patterns of a window INCLUDING the cell we are on
             data_patterns = patterns.data[column_index]
