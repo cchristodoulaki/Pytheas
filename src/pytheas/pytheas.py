@@ -53,23 +53,16 @@ import re
 import subprocess
 import random
 
-# Database connection credentials
-db_cred = DotMap()
-db_cred.user = 'christina'
-db_cred.database = 'ground_truth_2k_canada'
-db_cred.opendata_database = 'opendata_profile'
-db_cred.port = 5532
-db_cred.password = 'marathi'
-opendata_engine = create_engine(f'postgresql+psycopg2://{db_cred.user}:{db_cred.password}@localhost:{db_cred.port}/{db_cred.opendata_database}')
 
-def generate_processing_tasks(pytheas_model, db_cred, files, max_lines, top_level_dir): 
+
+def generate_processing_tasks(pytheas_model, db_cred, files, max_lines, top_level_dir, opendata_engine): 
     file_counter = -1
     for file in files:
         file_counter+=1
         crawl_datafile_key, size_in_bytes, ground_truth_path,endpoint = file
         filepath = os.path.join(top_level_dir,
                              ground_truth_path)       
-        task = (db_cred, file_counter, pytheas_model, crawl_datafile_key, endpoint, filepath, max_lines)
+        task = (db_cred, file_counter, pytheas_model, crawl_datafile_key, endpoint, filepath, max_lines, opendata_engine)
         yield task  
 
 
@@ -83,7 +76,7 @@ def message_slack(message):
 
 def process_file_worker(t):
     row_sample_size=20
-    db_cred, file_counter, pytheas_model, crawl_datafile_key,endpoint, filepath, max_lines = t 
+    db_cred, file_counter, pytheas_model, crawl_datafile_key,endpoint, filepath, max_lines, opendata_engine = t 
     discovered_delimiter = None
     discovered_encoding = None
     num_lines_processed = None
@@ -129,7 +122,7 @@ def process_file_worker(t):
                         slice_idx = min(max_attributes,file_dataframe.shape[1])+1
 
                     file_max_columns_processed = file_dataframe.iloc[:,:slice_idx].shape[1]
-#                     print(file_dataframe.iloc[:,:slice_idx])
+                    # print(file_dataframe.iloc[:,:slice_idx])
                     predictions = pytheas_model.extract_tables( file_dataframe.iloc[:,:slice_idx], blank_lines)
                     if predictions != None:
                         num_tables=len(predictions)
@@ -1003,6 +996,8 @@ class PYTHEAS:
                             top_level_dir = '/home/christina/OPEN_DATA_CRAWL_2018', 
                             max_lines=None):    
 
+        opendata_engine = create_engine(f'postgresql+psycopg2://{db_cred.user}:{db_cred.password}@localhost:{db_cred.port}/{db_cred.opendata_database}')
+
         with opendata_engine.connect() as conn:
             endpoint_data = pd.read_sql_query(sql = f"""
             SELECT datafile_key as crawl_datafile_key, num_lines, size_bytes as size_in_bytes, path, endpoint_dbname
@@ -1034,7 +1029,7 @@ class PYTHEAS:
                                                                         db_cred, 
                                                                         files, 
                                                                         max_lines, 
-                                                                        top_level_dir )
+                                                                        top_level_dir, opendata_engine )
                                                 ):
                         pbar.update(1) 
                         processed+=1
