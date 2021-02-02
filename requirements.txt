@@ -2,7 +2,7 @@ aiohttp==3.6.2
 async-timeout==3.0.1
 attrs==19.2.0
 backcall==0.1.0
-bleach==3.1.0
+bleach==3.3.0
 cchardet==2.1.4
 certifi==2019.9.11
 cffi==1.13.2
