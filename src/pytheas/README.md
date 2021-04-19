@@ -63,3 +63,12 @@ E.g.:
 python pytheas.py infer -w trained_rules.json -f ../../data/examples/demo.csv -o inferred_annotation.json
 ```
 
+# Install with pip:
+```
+pip install --upgrade --force-reinstall pytheas-0.0.1-py3-none-any.whl
+```
+
+To run unit tests:
+```
+python -m unittest
+```

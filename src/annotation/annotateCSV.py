@@ -16,7 +16,7 @@ import json
 pp = pprint.PrettyPrinter(indent=4)
 pd.options.display.max_rows = 100
 
-def annotateCSV(filepath, max_lines, output_file):
+def annotateCSV(filepath, max_lines):
     Json_file_annotations = {}
     all_csv_tuples= None
     failure= None
@@ -132,20 +132,25 @@ def annotateCSV(filepath, max_lines, output_file):
                     print(f'{key}:{table_context[key]}')
                 print('~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  \n')    
         pp.pprint(file_annotations)
-        Json_file_annotations = Json(file_annotations)#to write to postgres
-        if output_file is not None:
-            with open(output_file, 'w') as outfile:
-                json.dump(file_annotations, outfile)
+
 
     return file_annotations
 
 def annotateCSVfolder(csv_dir, annotations_dir, max_lines):
-    for filename in sorted([os.path.join(csv_dir,f) for f in listdir(csv_dir) if isfile(join(csv_dir, f))]):
+    for fileindex in sorted([int(f.strip('.csv')) for f in os.listdir(csv_dir) if os.path.isfile(os.path.join(csv_dir, f))]):
+        filename = f'{fileindex}.csv'
+        print(f'annotations_dir={annotations_dir}')
+        print(f'filename={filename}')
+
         filepath = Path(os.path.join(csv_dir,filename))
         annotation_path = Path(os.path.join(annotations_dir,filename)).with_suffix('.json')
-        annotateCSV(filepath, 
-                    max_lines, 
-                    annotation_path)
+        print(f'annotation_path={annotation_path}')
+        if not os.path.exists(annotation_path):
+            file_annotations = annotateCSV(filepath, 
+                    max_lines)
+            if annotation_path is not None:
+                with open(annotation_path, 'w') as outfile:
+                    json.dump(file_annotations, outfile)
     return True
 
 
@@ -182,30 +187,12 @@ if __name__ == "__main__":
 
     # This is how you can tell which context was used
     if args.context == 'file':
-        annotateCSV(args.filepath, 
-                    args.max_lines, 
-                    args.output_file)
+        file_annotations = annotateCSV(args.filepath, 
+                    args.max_lines)
+        if args.output_file is not None:
+            with open(args.output_file, 'w') as outfile:
+                json.dump(file_annotations, outfile)
     elif args.context == 'folder':
         annotateCSVfolder(args.csv_directory, 
                             args.annotations_directory, 
                             args.max_lines)
-
-
-
-    # parser = argparse.ArgumentParser(description="")
-    # parser.add_argument("context", choices=['file', 'folder'])
-
-    # parser.add_argument("-p", "--filepath", help="path to CSV file for user annotation")
-    # parser.add_argument("-f", "--folderpath", help="path to folder with CSV files for user annotation")
-    # parser.add_argument("-a", "--annotations_folderpath", help="path to folder to write user annotations of CSV files")    
-    # parser.add_argument("-m", "--max_lines", type = int, default=None, help="maximum lines to display to user for annotation, default is None which will display entire file")
-    # parser.add_argument("-o", "--output_file", default = None)
-
-    # args = parser.parse_args(sys.argv[1:])
-    # if args.context == 'file':
-    #     annotateCSV(args.filepath, 
-    #                 args.max_lines, 
-    #                 args.output_file)
-    # elif args.context == 'folder':
-
-

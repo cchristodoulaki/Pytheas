@@ -15,7 +15,7 @@ import copy
 import cchardet as chardet
 import math
 # from asteval import Interpreter
-from parsemathexpr import evaluate
+from pytheas.parsemathexpr import evaluate
 import operator
 from statistics import mean
 # LOG

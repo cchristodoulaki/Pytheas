@@ -11,8 +11,8 @@ import copy
 from psycopg2 import connect
 import ast
 import pandas as pd
-from pat_utilities import generate_pattern_symbols_and_case, generate_pattern_summary
-from parsemathexpr import evaluate
+from pytheas.pat_utilities import generate_pattern_symbols_and_case, generate_pattern_summary
+from pytheas.parsemathexpr import evaluate
 
 stop = stopwords.words('french')+stopwords.words('english')+list(string.punctuation)
 null_equivalent =['','data not available','nan','not available','no data','no answer','nd','na','n/d','n/a','n.a.','not applicable','sans objet','s.o.','so','s/o','-','--','.','..','...','null','none','*','void','0','redacted', 'confidential', 'confidentiel']
