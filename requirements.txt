@@ -173,7 +173,7 @@ pyflakes==2.1.1
 Pygments==2.7.4
 pylint==1.6.4
 PyMySQL==0.7.11
-pyOpenSSL==16.2.0
+pyOpenSSL==17.5.0
 pyparsing==2.4.2
 pyprof2calltree==1.4.4
 pyrsistent==0.15.4
