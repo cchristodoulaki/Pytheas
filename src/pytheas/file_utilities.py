@@ -296,9 +296,9 @@ def merged_df(failure, all_csv_tuples):
                 
                 dataframe = pd.DataFrame(csv_tuples)
                 dataframe.index = list(range(start_index, end_index))
-                dataframe.fillna(value=pd.np.nan, inplace=True)
+                dataframe.fillna(value=np.nan, inplace=True)
                 dataframe.replace(to_replace=[None], value=np.nan, inplace=True)
-                dataframe = dataframe.replace(r'^\s*$' , pd.np.nan, regex=True)
+                dataframe = dataframe.replace(r'^\s*$' , np.nan, regex=True)
 
                 if start_index-1 in empty_lines or len(dataframes)==0:
                     dataframes.append(dataframe)
@@ -358,7 +358,7 @@ def get_dataframe(filepath, max_lines):
     return merged_df(failure, all_csv_tuples)
 
 
-def sample_file(filepath,max_batch= 100):
+def sample_file(filepath, max_batch= 100):
     batch = None
     discovered_delimiter = None
     discovered_encoding = None

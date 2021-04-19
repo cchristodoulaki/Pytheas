@@ -6,11 +6,11 @@ import codecs
 import pandas as pd
 import numpy as np
 import csv
-from pat_utilities import null_equivalent_values as null_equivalent
-import pat_utilities as pat
-from pat_utilities import line_rules
-from pat_utilities import cell_rules
-from header_events import collect_events_on_row, collect_arithmetic_events_on_row, header_row_with_aggregation_tokens
+from pytheas.pat_utilities import null_equivalent_values as null_equivalent
+import pytheas.pat_utilities as pat
+from pytheas.pat_utilities import line_rules
+from pytheas.pat_utilities import cell_rules
+from pytheas.header_events import collect_events_on_row, collect_arithmetic_events_on_row, header_row_with_aggregation_tokens
 import copy
 from nltk import word_tokenize
 from nltk.corpus import stopwords
@@ -3189,30 +3189,65 @@ def assess_combo_header(candidate_header_dataframe):
         else: 
             return False
 
-        return False
+        return False  
 
 def combo_row(rows):
-    rows = rows.values
-    combo_row = list(rows[0])
-    for rowidx, row in enumerate(rows):
-        if rowidx==0:
-            continue
-        buffer_row=rows[rowidx-1]
-        buffer_row = [str(i).strip() if str(i).strip().lower() not in ['','nan', 'none', 'null'] else '' for i in buffer_row]
-        for idx, value in enumerate(buffer_row):
-            if idx+1<len(buffer_row) and buffer_row[idx+1].strip() == '':
-                buffer_row[idx+1] = pat.dequote(value.strip())
-        for idx, value in enumerate(row):
-            if str(value).strip().lower() in ['','nan', 'none', 'null']:
-                value = ''
-            value = str(value)
-            combo_row = [str(i).strip().lower() if str(i).strip().lower() not in ['','nan', 'none', 'null'] else '' for i in combo_row]
-            if combo_row[idx].strip()!='':
-               combo_row[idx] =  (pat.dequote(str(combo_row[idx]).strip())+' '+pat.dequote(str(value).strip()).strip())
-            else:
-               combo_row[idx] =  (buffer_row[idx].strip()+' '+pat.dequote(value.strip()).strip()) 
-    return combo_row  
-    
+
+    column_names = name_table_columns(rows)
+    combo_row = []
+    for csv_column, column in column_names.items():
+        combo_row.append((" ".join([cell["value"].lower() for cell in column["column_header"]])).strip())
+    return combo_row
+
+def name_table_columns(rows):
+    rows = rows.applymap(lambda v: pat.dequote(str(v).strip()) if str(v).strip().lower() not in ['','nan', 'none', 'null'] else '')
+    column_names = {}
+    for rowidx, row in rows.iterrows():
+        #initialize with first row
+        if rowidx==rows.index[0]:
+            for csv_index, value in row.items():
+                column_names[csv_index] = {'column_header':[],
+                                            'table_column': row.index.get_loc(csv_index)
+                                            }
+                if value!='':
+                    column_names[csv_index]['column_header'].append({'row':rowidx,
+                                                                    'column':csv_index,
+                                                                    'value':value,
+                                                                    'index':len(column_names[csv_index]['column_header'])})                                          
+        else:            
+
+            buffer_row = {}
+            for csv_index, value in rows.loc[previous_row].items():
+               
+                if csv_index !=rows.index[-1] and (rows.columns.get_indexer([csv_index])+1)[0] < len(rows.columns):
+                    next_csv_column = rows.columns[(rows.columns.get_indexer([csv_index])+1)[0]]
+                    while rows.loc[previous_row, next_csv_column] == '':
+                        if rows.loc[previous_row, csv_index]!='':
+                            buffer_row[next_csv_column] = {
+                                'row':previous_row,
+                                'column':csv_index,
+                                'value': rows.loc[previous_row, csv_index],
+                                'index':len(buffer_row)
+                            }
+                        if (rows.columns.get_indexer([next_csv_column])+1)[0] < len(rows.columns):
+                            next_csv_column = rows.columns[(rows.columns.get_indexer([next_csv_column])+1)[0]]
+                        else:
+                            break
+
+            for csv_index, value in row.items(): 
+                if sum(cell['value'] !='' for cell in column_names[csv_index]['column_header'])==0:  
+                    if csv_index in buffer_row.keys():  
+                        column_names[csv_index]['column_header'].append(buffer_row[csv_index]) 
+                if value!='':
+                    column_names[csv_index]['column_header'].append({
+                        'row':rowidx,
+                        'column':csv_index,
+                        'value':value,
+                        'index':len(column_names[csv_index]['column_header'])
+                        })
+
+        previous_row = rowidx
+    return column_names 
 
 def pre_header_line(row_values,before_header):
 
@@ -3356,7 +3391,7 @@ def predict_header_indexes(file_dataframe, first_data_line_annotated, table_coun
             if (len(predicted_header_indexes)>0 and (has_duplicates(consider_header_dataframe)==False)):
                NON_DUPLICATE_HEADER_ACHIEVED = True 
 
-            if non_empty_lines_assessed>4:#was ==
+            if non_empty_lines_assessed>4:
                 break
 
 
@@ -3367,16 +3402,16 @@ def predict_header_indexes(file_dataframe, first_data_line_annotated, table_coun
                     predicted_header_indexes.insert(0,predicted_header_indexes[0]-1)
                     # if len(dataframe.loc[predicted_header_indexes].dropna(thresh=1))>5:
 
-
-            last_header_index = predicted_header_indexes[-1]      
-            while len(predicted_header_indexes)>0:
-                first_value = str(file_dataframe.loc[last_header_index,file_dataframe.columns[0]]).strip()
-                if  len(dataframe.columns)>1 and file_dataframe.loc[last_header_index, 1:].isnull().values.all()==True and (first_value.startswith('(') and first_value.endswith(')'))==False:
-                    predicted_pat_subheaders.append(last_header_index)
-                    predicted_header_indexes = predicted_header_indexes[:-1]
-                    last_header_index = predicted_header_indexes[-1]
-                else:
-                    break
+            if len(predicted_header_indexes)>0:
+                last_header_index = predicted_header_indexes[-1]      
+                while len(predicted_header_indexes)>0:
+                    first_value = str(file_dataframe.loc[last_header_index,file_dataframe.columns[0]]).strip()
+                    if  len(dataframe.columns)>1 and file_dataframe.loc[last_header_index, 1:].isnull().values.all()==True and (first_value.startswith('(') and first_value.endswith(')'))==False:
+                        predicted_pat_subheaders.append(last_header_index)
+                        predicted_header_indexes = predicted_header_indexes[:-1]
+                        last_header_index = predicted_header_indexes[-1]
+                    else:
+                        break
         else:
             if len(predicted_header_indexes)==0 and table_counter == 1 and first_data_line_annotated>0 and len(candidate_headers)>0:
                 count_offset = 0

@@ -9,7 +9,7 @@ import csv
 from os import listdir
 from os.path import isfile, join
 
-import string_utils
+# import string_utils
 import copy
 import io
 from sqlalchemy import create_engine
@@ -35,14 +35,16 @@ from nltk.corpus import stopwords
 import string
 stop = stopwords.words('french')+stopwords.words('english')+list(string.punctuation)
 
-import nb_utilities as nb_util
-import file_utilities
-import table_classifier_utilities
-from table_classifier_utilities import TableSignatures, is_consistent_symbol_sets, predict_fdl, predict_line_label, predict_combined_data_confidences, predict_header_indexes, eval_data_cell_rule, eval_not_data_cell_rule, line_has_null_equivalent, all_numbers, is_number, assess_data_line, assess_non_data_line,non_nulls_in_line, discover_aggregation_scope, contains_number, combo_row
-import pat_utilities as pat_util
-from header_events import collect_events_on_row, collect_arithmetic_events_on_row, header_row_with_aggregation_tokens
-sys.path.append('../evaluation')
-import evaluation_utilities
+
+
+import pytheas.nb_utilities as nb_util
+import pytheas.file_utilities as file_utilities
+import pytheas.table_classifier_utilities as table_classifier_utilities
+from pytheas.table_classifier_utilities import TableSignatures, is_consistent_symbol_sets, predict_fdl, predict_line_label, predict_combined_data_confidences, predict_header_indexes, eval_data_cell_rule, eval_not_data_cell_rule, line_has_null_equivalent, all_numbers, is_number, assess_data_line, assess_non_data_line,non_nulls_in_line, discover_aggregation_scope, contains_number, name_table_columns, combo_row
+import pytheas.pat_utilities as pat_util
+from pytheas.header_events import collect_events_on_row, collect_arithmetic_events_on_row, header_row_with_aggregation_tokens
+import evaluation.evaluation_utilities as evaluation_utilities
+
 import requests
 
 import pprint
@@ -194,20 +196,24 @@ def process_file_worker(t):
                     header_dataframe = file_dataframe.loc[header_lines]
                     header_length=len(header_dataframe.dropna(axis='rows', how='all'))
 
-                    column_names = combo_row(header_dataframe) #apply combination algorithm to values in discovered header section
 
-                    # Comment out unfinished project
-                    # predictions[table_id]["columns"] = {}
+
+                    null_columns = table_dataframe.columns[table_dataframe.isna().all()].tolist()  
+                    table_dataframe = table_dataframe.drop(null_columns, axis=1)
+                    column_names = name_table_columns(table_dataframe.loc[header_lines]) #apply combination algorithm to values in discovered header section
+                    predictions[table_id]["columns"] = column_names
+
                     # sample_rows = random.sample(table_dataframe.index, min(len(table_dataframe), row_sample_size))
                     # patterns = Patterns()
-                    # for index, column_name in enumerate(table_dataframe.index):
-                    #     column_combo_name = column_names[index]
+                    # for index, column_label in enumerate(table_dataframe.columns):
+                    #     column_combo_name = column_names[column_label]
                     #     column = {}
-                    #     column["csv_index"] = column_name
+                    #     column["csv_column"] = column_label
                     #     column["combo_name"] = column_combo_name
-                    #     column["patterns"] = patterns.generate_column_patterns(table_dataframe.loc[sample_rows, [column_name]]).summary
+                    #    # column["patterns"] = patterns.generate_column_patterns(table_dataframe.loc[sample_rows, [column_name]]).summary
+                    #    predictions[table_id]["columns"][index] = column
+                    ###### 
 
-                    #     predictions[table_id]["columns"][index] = column
                     predictions[table_id]["header_lines"] = header_dataframe.to_json(orient='split')
 
 
@@ -405,7 +411,7 @@ class API(object):
         self.real_pytheas.load_weights(filepath)
 
     def infer_annotations(self, filepath, max_lines=None):
-        return self.real_pytheas.infer_annotations(filepath)
+        return self.real_pytheas.infer_annotations(filepath, max_lines)
         
     def learn_and_save_weights(self, files_path, annotations_path, output_path='train_output.json', parameters=None):
         # self.real_pytheas.clear_weights()
@@ -1099,7 +1105,8 @@ class PYTHEAS:
                                                 data_rules_fired, 
                                                 not_data_rules_fired, 
                                                 blank_lines, 
-                                                headers_discovered, signatures,
+                                                headers_discovered, 
+                                                signatures,
                                                 self)
 
             # print(f'discovered_table={discovered_table}')                                    
@@ -1144,7 +1151,16 @@ class PYTHEAS:
 
 
     def infer_annotations(self, filepath, max_lines=None):
-       
+        '''
+        Returns a dictionary of annotations for the file located at filepath, optionally limited at max_lines
+            Parameters:
+                filepath (string): absolute path to file
+                max_lines (int): [optional] limit of lines to be processed from file
+            Returns:
+                annotations (dict): Dictionary representation of inferred file annotations
+        '''
+        # print(f'infer_annotations(filepath={filepath}, max_lines={max_lines})')
+
         discovered_delimiter = None
         discovered_encoding = None
         num_lines_processed = None
@@ -1183,8 +1199,8 @@ class PYTHEAS:
 
                     file_max_columns_processed = file_dataframe.iloc[:,:slice_idx].shape[1]
                     predictions = self.extract_tables(file_dataframe.iloc[:,:slice_idx],  blank_lines)
-            
-            annotations = convert_predictions(predictions, blank_lines, last_line_processed, file_num_columns, file_max_columns_processed)
+
+                    annotations = convert_predictions(predictions, blank_lines, last_line_processed, file_num_columns, file_max_columns_processed)
 
         except Exception as e: 
             print(f'filepath={filepath} failed to process, {e}: {traceback.format_exc()}')
@@ -1431,18 +1447,20 @@ def convert_predictions(predictions, blank_lines, last_line_processed, file_num_
     annotations["tables"] = []
     for key in predictions.keys():
         table = dict()
-        table["table_counter"] = key
-        table["top_boundary"] = predictions[key]["top_boundary"]
-        table["bottom_boundary"] = predictions[key]["bottom_boundary"]
-        table["data_start"] = predictions[key]["data_start"]
-        table["data_end"] = predictions[key]["data_end"]
-        table["header"] = predictions[key]["header"]
-        table["footnotes"] = predictions[key]["footnotes"]
-        table["subheaders"] = list(predictions[key]["subheader_scope"].keys())
-        table["confidence"] = {"body_start": predictions[key]["fdl_confidence"]["avg_majority_confidence"], 
-                                "body_end": predictions[key]["data_end_confidence"],
-                                "body": combined_table_confidence(predictions[key]["fdl_confidence"]["avg_majority_confidence"], 
-                                                                predictions[key]["data_end_confidence"])}
+
+        table["table_counter"] = int(key)
+        table["top_boundary"] = int(predictions[key]["top_boundary"])
+        table["bottom_boundary"] = int(predictions[key]["bottom_boundary"])
+        table["data_start"] = int(predictions[key]["data_start"])
+        table["data_end"] = int(predictions[key]["data_end"])
+        table["header"] = [int(i) for i in predictions[key]["header"]]
+        table["footnotes"] = [int(i) for i in predictions[key]["footnotes"]]
+        table["subheaders"] = [int(i) for i in list(predictions[key]["subheader_scope"].keys())]
+        table["confidence"] = {"body_start": float(predictions[key]["fdl_confidence"]["avg_majority_confidence"]), 
+                                "body_end": float(predictions[key]["data_end_confidence"]),
+                                "body": float(combined_table_confidence(predictions[key]["fdl_confidence"]["avg_majority_confidence"], 
+                                                                predictions[key]["data_end_confidence"]))}
+        table['columns']=predictions[key]['columns']
         annotations["tables"].append(table)  
     return annotations  
 
@@ -1841,6 +1859,9 @@ def discover_next_table(csv_file, file_offset, table_counter, data_rules_fired, 
             
         predicted_pat_data_lines=[]
         
+        header_dataframe = csv_file.loc[predicted_pat_header_indexes]
+   
+            
     #     # First data line predicted
     #     #############################   END  ###############################################
 
@@ -1872,6 +1893,12 @@ def discover_next_table(csv_file, file_offset, table_counter, data_rules_fired, 
         discovered_table['data_start'] = data_section_start
         discovered_table['data_end_confidence']=bottom_boundary_confidence['confidence']
 
+        table_dataframe = pd.concat([header_dataframe, csv_file.loc[pat_first_data_line:pat_last_data_line]])
+        null_columns = table_dataframe.columns[table_dataframe.isna().all()].tolist()  
+        table_dataframe = table_dataframe.drop(null_columns, axis=1)
+        column_names = name_table_columns(table_dataframe.loc[predicted_pat_header_indexes]) 
+        discovered_table['columns']=column_names
+        
         discovered_table['fdl_confidence']= dict()
         discovered_table['fdl_confidence']["avg_majority_confidence"]=float(first_data_line_combined_data_predictions["avg_confidence"]['confidence'])
         discovered_table['fdl_confidence']["avg_difference"]=float(first_data_line_combined_data_predictions["avg_confidence"]['difference'])
@@ -3191,7 +3218,7 @@ def process_csv_worker(task):
     try:
         discovered_tables = pytheas_model.extract_tables(file_dataframe_trimmed, blank_lines)
     
-        line_predictions, cell_predictions = evaluation_utilities.assign_class(db_cred, file_dataframe_trimmed, 
+        line_predictions, cell_predictions = evaluation_utilities.assign_class(file_dataframe_trimmed, 
                                                                             discovered_tables, blank_lines, 
                                                                             crawl_datafile_key, annotations, fold_id)   
     

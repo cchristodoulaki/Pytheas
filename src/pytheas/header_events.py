@@ -1,6 +1,6 @@
 import sys
-import utilities
-import nb_utilities as nb_util
+import pytheas.utilities as utilities
+import pytheas.nb_utilities as nb_util
 import string_utils
 from unidecode import unidecode
 
