@@ -94,7 +94,7 @@ isort==4.3.21
 itsdangerous==1.1.0
 jdcal==1.3
 jedi==0.15.1
-Jinja2==2.10.1
+Jinja2==2.11.3
 jmespath==0.9.4
 joblib==0.14.0
 JPype1==0.6.2
@@ -113,7 +113,7 @@ lazy-object-proxy==1.4.2
 linecache2==1.0.0
 llvmlite==0.29.0
 locket==0.2.0
-lxml==3.7.2
+lxml==4.6.3
 Mako==1.0.7
 MarkupSafe==1.1.1
 matplotlib==3.1.1
@@ -132,7 +132,7 @@ nbformat==4.2.0
 networkx==2.3
 nltk==3.2.2
 nose==1.3.7
-notebook==4.3.1
+notebook==6.1.5
 numba==0.45.1
 numexpr==2.7.0
 numpy==1.16.4
@@ -152,7 +152,7 @@ pep8==1.7.1
 pexpect==4.7.0
 pgadmin4==2.1
 pickleshare==0.7.5
-Pillow==6.1.0
+Pillow==8.1.1
 plotly==3.10.0
 plotrique==0.2.5.post7
 pluggy==0.13.0
@@ -170,7 +170,7 @@ pycparser==2.19
 pycrypto==2.6.1
 pycurl==7.43.0
 pyflakes==2.1.1
-Pygments==2.4.2
+Pygments==2.7.4
 pylint==1.6.4
 PyMySQL==0.7.11
 pyOpenSSL==16.2.0
@@ -193,7 +193,7 @@ python-string-utils==0.6.0
 pytz==2019.2
 PyWavelets==1.0.3
 pywikibot==3.0.dev0
-PyYAML==5.1.2
+PyYAML==5.4
 pyzmq==18.1.0
 QtAwesome==0.4.3
 qtconsole==4.2.1
