@@ -35,3 +35,91 @@ Christina Christodoulakis, Eric B. Munson, Moshe Gabel, Angela Demke Brown, and 
 
 ### Pytheas rule-set description
 [HTML rendering of Pytheas rules](https://cchristodoulaki.github.io/Pytheas/) listed in [https://github.com/cchristodoulaki/Pytheas/tree/master/pytheas/rules](https://github.com/cchristodoulaki/Pytheas/tree/master/pytheas/rules)
+
+## Requirements
+
+- Ubuntu 18.04.5 LTS
+- Python3.7
+- venv
+
+Create your venv by running `python3 -m venv pytheas-venv`, and activate it by running `source pytheas-venv/bin/activate`.
+
+## Setup
+Package the Pytheas project into a [wheel](https://realpython.com/python-wheels/), and install it using pip:
+```
+cd src
+python setup.py sdist bdist_wheel
+pip install  --upgrade --force-reinstall dist/pytheas-0.0.1-py3-none-any.whl
+```
+You may need to download nltk stopwords:
+```
+python -m nltk.downloader stopwords
+```
+
+## Pytheas Python API
+
+### Load trained weights
+We have pretrained Pytheas rules using a set of 2000 Open Data CSV files from Canadian CKAN portals. We expect to release those files and their annotations  in the future. 
+
+```python
+from pytheas import pytheas
+import json
+from pprint import pprint
+Pytheas = pytheas.API()
+Pytheas.load_weights('pytheas/trained_rules.json')
+```
+We now have a trained instance of Pytheas. 
+
+### Train from dataset
+
+If you want, you can also train Pytheas using your own files and annotations. 
+Training from annotated data requires two folders, one with CSV files and one with JSON files containing user annotations over the CSV files. A file with annotations for a CSV file must have the same filename as the CSV file (and extension `.json`).
+
+```
+from pytheas import pytheas
+Pytheas = pytheas.API()
+Pytheas.learn_and_save_weights('../data/Canada/csv_files','../data/Canada/csv_annotations')
+```
+
+### Apply Pytheas to CSV file
+To apply Pytheas to a CSV file, we must either train the model on an annotated dataset, or load pretrained rules.
+
+In the example below, we load rule weights from a file, and apply demo.csv:
+
+```python
+
+from pytheas import pytheas
+from pprint import pprint
+Pytheas = pytheas.API()
+
+#load pretrained rule weights
+Pytheas.load_weights('pytheas/trained_rules.json')
+
+filepath = '../data/examples/demo.csv'     
+file_annotations = Pytheas.infer_annotations(filepath)
+pprint(file_annotations) 
+
+```
+
+## Pytheas CLI
+
+### Train
+```
+pytheas train --files files --annotations annotations
+```
+
+E.g.:
+
+```
+python pytheas.py train -c ../data/Canada/csv_files -a ../data/Canada/csv_annotations -o train_output.json
+```
+
+### Infer
+```
+pytheas infer --weights weightfile  --filepath filepath
+```
+
+E.g.:
+```
+python pytheas.py infer -w trained_rules.json -f ../../data/examples/demo.csv -o inferred_annotation.json
+```
