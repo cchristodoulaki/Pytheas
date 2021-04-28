@@ -2,6 +2,7 @@
 src/pytheas/__pycache__/
 
 # ignore virtual environment
+pytheas-venv/
 pytheas-env/
 
 # ignore visual studio code workspace
@@ -11,16 +12,18 @@ pytheas.workspace.code-workspace
 src/database_credentials.json
 
 # ignore CSV files and annotations for training Pytheas,
-data/Canada
+data/Canada/
 data/examples/*
 # ignore all data except demo
 !data/examples/demo.csv
 !data/examples/demo.json
 
 # ignore evaluation
-src/evaluation
+#src/evaluation
 
 # ignore script for converting annotations in psql
 # to two folders: a) csv files, b) json files (annotations)
 src/pytheas/save_training_input.py
 
+# 
+src/build/
