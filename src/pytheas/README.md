@@ -1,9 +1,15 @@
+# Setup
+
+```
+python -m nltk.downloader stopwords
+```
 # Pytheas Python API
+
 ## Train from dataset
 Training from annotated data requires two folders, one with CSV files and one with JSON files containing manual annotations over the CSV files. A file with annotations for a CSV file must have the same filename as the CSV file (and extension `.json`).
 
 ```
-import pytheas
+from pytheas import pytheas
 pytheas = pytheas.API()
 pytheas.learn_and_save_weights('../../data/Canada/csv_files','../../data/Canada/csv_annotations')
 ```
